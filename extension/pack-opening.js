@@ -116,6 +116,8 @@ const SCISSORS_PARTS = {
 // Handle colours: coral on the yellow puzzle pack, the site's green on the others. The guide on
 // the pack takes them from CSS (--sc-handle, --sc-deep); the cursor, an image, is drawn in them.
 const SCISSORS_INK = { puzzle: ['#ff5a4c', '#b3322b'], other: ['#34c98e', '#1d8a5c'] };
+// The drawn packs with a coloured paper take the coral pair; green scissors would vanish on the green one.
+const CORAL_SCISSORS = new Set(['puzzle', 'green', 'globe']);
 function scissorsHalf(part, { outline = '', handle = 'var(--sc-handle)', deep = 'var(--sc-deep)' } = {}) {
   const { blade, shank, ring: [cx, cy] } = SCISSORS_PARTS[part];
   const ringShape = `<ellipse cx="${cx}" cy="${cy}" rx="12.5" ry="9.5"/>`;
@@ -686,7 +688,7 @@ function buildPackVolume(body) {
 /* ─── Experience ──────────────────────────────────────────────────────────── */
 
 export function openPackExperience({
-  requestOpen, remaining = null, capacity = 10, sourceRect = null, packSrc, packSvg, puzzleSvg, puzzleBack,
+  requestOpen, remaining = null, capacity = 10, sourceRect = null, packSrc, packSvg, puzzleSvg, puzzleBack, greenSvg, greenBack, globeSvg, globeBack,
   assetOrigin = location.origin, cssText = '', muted = false, onMuteChange, onClose,
   packStyle = 'puzzle', onPackStyleChange, speed: initialSpeed = 1, onSpeedChange,
   antiSpoil: initialAntiSpoil = false, onAntiSpoilChange, collectionPath = '/collection',
@@ -910,12 +912,15 @@ export function openPackExperience({
   dialog.append(root);
   shadow.append(style, dialog);
 
-  // Three designs, in the order the button goes through them: the colourful puzzle pack (the
-  // default), the dark foil one and the site's own. The two drawn by the extension get their own
-  // dog-eared corner each time. The foil is masked by the art, so it stays hidden until the image
+  // Five designs, in the order the button goes through them: the colourful puzzle pack (the
+  // default), the green one, the white one (the world as a puzzle), the dark foil one and the
+  // site's own. Those drawn by the extension get
+  // their own dog-eared corner each time. The foil is masked by the art, so it stays hidden until the image
   // is decoded: otherwise the foil and the glow briefly draw a plain rectangle.
   const LOOKS = [
     { name: 'puzzle', svg: puzzleSvg, label: 'paquet puzzle' },
+    { name: 'green', svg: greenSvg, label: 'paquet vert' },
+    { name: 'globe', svg: globeSvg, label: 'paquet globe' },
     { name: 'dark', svg: packSvg, label: 'paquet sombre' },
     { name: 'classic', label: 'paquet d’origine' },
   ].filter(look => look.name === 'classic' || look.svg);
@@ -1001,24 +1006,25 @@ export function openPackExperience({
   // The cursor over the pack is a pair of scissors, open; while tearing it snips (see apply).
   // Its colours follow the design (see put, in prepareLook).
   function scissorsFor(look) {
-    const [open, shut] = SCISSORS_CURSORS[look === 'puzzle' ? 'puzzle' : 'other'];
+    const [open, shut] = SCISSORS_CURSORS[CORAL_SCISSORS.has(look) ? 'puzzle' : 'other'];
     root.style.setProperty('--scissors-open', open);
     root.style.setProperty('--scissors-shut', shut);
   }
-  // The backs of the cards that come out of the puzzle pack (see pack-opening.css), drawn once as a
-  // bitmap for the largest a card is shown (the SVG carries filters, see rasterArt). Until then,
-  // and if that fails, the back is its plain indigo.
-  let backUrl = null;
-  if (puzzleBack) {
-    fetch(puzzleBack).then(response => (response.ok ? response.text() : Promise.reject(new Error('back'))))
+  // The backs of the cards that come out of the drawn packs (see pack-opening.css), each drawn
+  // once as a bitmap for the largest a card is shown (the SVG carries filters, see rasterArt).
+  // Until then, and if that fails, a back is its plain colour.
+  const backUrls = [];
+  for (const [name, source] of [['puzzle', puzzleBack], ['green', greenBack], ['globe', globeBack]]) {
+    if (!source) continue;
+    fetch(source).then(response => (response.ok ? response.text() : Promise.reject(new Error('back'))))
       .then(async svg => {
-        const source = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
-        try { return await rasterArt(source, artPixels(280), artPixels(392)); } finally { URL.revokeObjectURL(source); }
+        const blob = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+        try { return await rasterArt(blob, artPixels(280), artPixels(392)); } finally { URL.revokeObjectURL(blob); }
       })
       .then(({ url }) => {
         if (!alive) { URL.revokeObjectURL(url); return; }
-        backUrl = url;
-        root.style.setProperty('--puzzle-back', `url("${url}")`);
+        backUrls.push(url);
+        root.style.setProperty(`--${name}-back`, `url("${url}")`);
       }, () => {});
   }
 
@@ -1737,14 +1743,6 @@ export function openPackExperience({
   }
   const spotlightPose = 'translate3d(0, 0, 80px) scale(1.04)';
   const shade = position => (Math.min(position, 9) * .03).toFixed(3);
-  const shuffled = list => {
-    const copy = [...list];
-    for (let index = copy.length - 1; index > 0; index -= 1) {
-      const other = Math.floor(Math.random() * (index + 1));
-      [copy[index], copy[other]] = [copy[other], copy[index]];
-    }
-    return copy;
-  };
 
   /* The cards slide out of the opening. While they are inside they sit just behind the
      front of the pack, thin, so the pack's own skin hides them exactly where it should;
@@ -2501,10 +2499,9 @@ export function openPackExperience({
 
     const cards = result.cards.map(data => createCard(data, assetOrigin));
     const best = cards.reduce((top, card) => card.meta.tier > top.meta.tier ? card : top, cards[0]);
-    // Keep the server order, which rises in rarity; the best card closes the pack. Anti-spoil
-    // deals them in a random order, so even the position of a card tells nothing.
-    const ordered = antiSpoil ? shuffled(cards)
-      : cards.map((card, index) => ({ card, index })).sort((a, b) => a.card.meta.tier - b.card.meta.tier || a.index - b.index).map(item => item.card);
+    // Keep the server order, which rises in rarity: the best card closes the pack, anti-spoil or
+    // not (anti-spoil only hides the rarity until each flip: the light's colours, the staging).
+    const ordered = cards.map((card, index) => ({ card, index })).sort((a, b) => a.card.meta.tier - b.card.meta.tier || a.index - b.index).map(item => item.card);
     ordered.forEach((card, index) => { card.root.dataset.stack = String(index); });
 
     buildTray(ordered.length);
@@ -2578,7 +2575,7 @@ export function openPackExperience({
     host.remove();
     for (const item of packUrls) URL.revokeObjectURL(item);
     upcoming?.ready.then(({ discard }) => discard());
-    if (backUrl) URL.revokeObjectURL(backUrl);
+    backUrls.forEach(url => URL.revokeObjectURL(url));
   }
 
   /* Wiring */
@@ -2821,13 +2818,17 @@ function readNativeState(button, cache) {
   return { state };
 }
 
-export function installPackOpening({ cssUrl, packUrl, puzzleUrl, puzzleBackUrl }) {
+export function installPackOpening({ cssUrl, packUrl, puzzleUrl, puzzleBackUrl, greenUrl, greenBackUrl, globeUrl, globeBackUrl }) {
   let cssText;
   let packSvg;
   let puzzleSvg;
+  let greenSvg;
+  let globeSvg;
   const art = url => fetch(url).then(response => response.ok ? response.text() : Promise.reject(new Error('pack')));
   art(packUrl).then(svg => { packSvg = svg; }, () => {});
   if (puzzleUrl) art(puzzleUrl).then(svg => { puzzleSvg = svg; }, () => {});
+  if (greenUrl) art(greenUrl).then(svg => { greenSvg = svg; }, () => {});
+  if (globeUrl) art(globeUrl).then(svg => { globeSvg = svg; }, () => {});
   let active = null;
   const cache = { button: null, state: null, at: 0 };
   const css = fetch(cssUrl).then(response => response.ok ? response.text() : Promise.reject(new Error(`styles ${response.status}`)))
@@ -2853,7 +2854,7 @@ export function installPackOpening({ cssUrl, packUrl, puzzleUrl, puzzleBackUrl }
     if (extensionAlive()) chrome.storage.local.set(values).catch(() => {});
   }
   // The native Paquets page shows the same pack design as the experience (see site-theme.css).
-  const DESIGNS = ['puzzle', 'dark', 'classic'];
+  const DESIGNS = ['puzzle', 'green', 'globe', 'dark', 'classic'];
   const designOf = value => (DESIGNS.includes(value) ? value : 'puzzle');
   function applyStyle(value) {
     document.documentElement.setAttribute('data-wme-pack-style', designOf(value));
@@ -2912,6 +2913,10 @@ export function installPackOpening({ cssUrl, packUrl, puzzleUrl, puzzleBackUrl }
         packSvg,
         puzzleSvg,
         puzzleBack: puzzleBackUrl,
+        greenSvg,
+        greenBack: greenBackUrl,
+        globeSvg,
+        globeBack: globeBackUrl,
         cssText,
         muted: packFxMuted === true,
         packStyle: designOf(packDesign),

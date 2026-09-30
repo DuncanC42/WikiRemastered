@@ -111,6 +111,8 @@ async function requestOpen() {
 const cssText = await fetch('../extension/pack-opening.css').then(response => response.text());
 const packSvg = await fetch('../extension/pack-art.svg').then(response => response.text());
 const puzzleSvg = await fetch('../extension/pack-art-puzzle.svg').then(response => response.text());
+const greenSvg = await fetch('../extension/pack-art-green.svg').then(response => response.text());
+const globeSvg = await fetch('../extension/pack-art-globe.svg').then(response => response.text());
 let muted = false;
 let packStyle = 'puzzle';
 let antiSpoil = false;
@@ -119,7 +121,7 @@ try { packStyle = localStorage.getItem('packDesign') || 'puzzle'; antiSpoil = lo
 function launch() {
   const image = document.querySelector('#pack img').getBoundingClientRect();
   openPackExperience({
-    requestOpen, remaining: stock, sourceRect: image, packSvg, puzzleSvg, puzzleBack: new URL('../extension/card-back-puzzle.svg', location.href).href, assetOrigin: ORIGIN, cssText, muted,
+    requestOpen, remaining: stock, sourceRect: image, packSvg, puzzleSvg, puzzleBack: new URL('../extension/card-back-puzzle.svg', location.href).href, greenSvg, greenBack: new URL('../extension/card-back-green.svg', location.href).href, globeSvg, globeBack: new URL('../extension/card-back-globe.svg', location.href).href, assetOrigin: ORIGIN, cssText, muted,
     onMuteChange: value => { muted = value; },
     packStyle,
     onPackStyleChange: value => { packStyle = value; try { localStorage.setItem('packDesign', value); } catch {} },

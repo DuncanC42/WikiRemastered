@@ -7,7 +7,7 @@
  * which only ever sees the system's fonts), leaning slightly forward.
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const at = path => fileURLToPath(new URL(`../${path}`, import.meta.url));
 const f = value => (Math.round(value * 100) / 100).toString();
@@ -16,9 +16,9 @@ const rgb = value => [1, 3, 5].map(index => parseInt(value.slice(index, index + 
 const mix = (a, b, t) => hex(rgb(a).map((value, index) => value + (rgb(b)[index] - value) * t));
 
 // The site's green, and the inks of the puzzle pack.
-const GREEN = { face: '#3ddc97', rim: '#b4f7d8', shift: '#2fc987', near: '#1c9e68', far: '#0a4a31' };
-const WHITE = { face: '#f3f6f2', rim: '#ffffff', shift: '#dbe4de', near: '#9db3a8', far: '#3f4f47' };
-const CORAL = { face: '#ff5a4c', rim: '#ffb3a8', shift: '#ec4a3d', near: '#c23b3b', far: '#6e1f1f' };
+export const GREEN = { face: '#3ddc97', rim: '#b4f7d8', shift: '#2fc987', near: '#1c9e68', far: '#0a4a31' };
+export const WHITE = { face: '#f3f6f2', rim: '#ffffff', shift: '#dbe4de', near: '#9db3a8', far: '#3f4f47' };
+export const CORAL = { face: '#ff5a4c', rim: '#ffb3a8', shift: '#ec4a3d', near: '#c23b3b', far: '#6e1f1f' };
 
 /* A heavy geometric lowercase (and the two capitals), baseline 100, x-height 44, caps at 4. */
 const LETTERS = {
@@ -50,7 +50,7 @@ function paint(shapes, color, [dx, dy] = [0, 0]) {
 /* A solid: its depth (copies stepping back along `toward`, from the near shade to the far one),
    then its face, lit, with a light rim left along its upper edges (the face shifted down and
    right, cut to the face, covers the rest). */
-function solid(id, shapes, ink, { depth = 12, toward = [.45, 1], rim = [2.2, 2.8] } = {}) {
+export function solid(id, shapes, ink, { depth = 12, toward = [.45, 1], rim = [2.2, 2.8] } = {}) {
   const [tx, ty] = toward;
   const length = Math.hypot(tx, ty);
   const steps = [];
@@ -75,7 +75,7 @@ function word(text) {
 }
 
 // The print grain, on the shapes only: fine specks, dark and light.
-const grain = (id, scale = 1) => `<filter id="${id}" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+export const grain = (id, scale = 1) => `<filter id="${id}" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
     <feTurbulence type="fractalNoise" baseFrequency="${f(.55 / scale)}" numOctaves="2" seed="7" result="noise"/>
     <feColorMatrix in="noise" values="0 0 0 0 0  0 0 0 0 .08  0 0 0 0 .05  0 0 0 9 -6.4" result="dark"/>
     <feComposite in="dark" in2="SourceAlpha" operator="in" result="darkOn"/>
@@ -86,8 +86,8 @@ const grain = (id, scale = 1) => `<filter id="${id}" x="0" y="0" width="100%" he
     <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="darkSoft"/><feMergeNode in="lightSoft"/></feMerge>
   </filter>`;
 
-const LEAN = -6; // Degrees: the wordmark leans forward a little.
-const GLYPHS = JSON.parse(readFileSync(at('scripts/brand-glyphs.json'), 'utf8'));
+export const LEAN = -6; // Degrees: the wordmark leans forward a little.
+export const GLYPHS = JSON.parse(readFileSync(at('scripts/brand-glyphs.json'), 'utf8'));
 
 /* The logo: "Wiki" in the site's green, "Remastered" in white, cut from a heavy display face
    (scripts/glyphs.py turns its letters into outlines) and made solid. `glyphs` is what that
@@ -117,7 +117,7 @@ export function logo(glyphs = GLYPHS) {
 
 // A small jigsaw piece, centred on (0, 0), `size` wide: its path, and its outline's points.
 function pieceOutline(size, tabs = [1, 1, -1, 1]) { return pieceShape(size, tabs).d; }
-function pieceShape(size, tabs = [1, 1, -1, 1]) {
+export function pieceShape(size, tabs = [1, 1, -1, 1]) {
   const knob = [[.3, 0], [.37, .012], [.415, .06], [.41, .12]];
   const edge = tab => {
     if (!tab) return [[0, 0], [.03, 0], [.97, 0], [1, 0]];
@@ -151,7 +151,7 @@ function pieceShape(size, tabs = [1, 1, -1, 1]) {
 /* The icon: a solid green jigsaw piece with the logo's W raised on its face (white, its edges in
    the piece's own deep greens, so it reads as part of it) and a coral plus, both from the logo's
    face. On a 128 grid, the art within the middle 112 (Chrome wants a margin around icons). */
-const RAISED = { face: '#f6faf7', rim: '#ffffff', shift: '#e3ece6', near: '#138557', far: '#0a4a31' };
+export const RAISED = { face: '#f6faf7', rim: '#ffffff', shift: '#e3ece6', near: '#138557', far: '#0a4a31' };
 export function icon({ size = 128, glyphs = GLYPHS } = {}) {
   const glyph = text => glyphs.words.find(word => word.text === text);
   // A glyph, centred on (0, 0), `height` tall.
@@ -176,6 +176,78 @@ export function icon({ size = 128, glyphs = GLYPHS } = {}) {
       <g transform="translate(${f(letterAt[0])} ${f(letterAt[1])}) skewX(${LEAN})">${letter.body}</g>
     </g>
     <g transform="translate(101 25) rotate(8)">${plus.body}</g>
+  </g>
+</svg>
+`;
+}
+
+/* The compact lockup, for the site's menu: the icon, and beside it the wordmark, either on one
+   line in a condensed face or stacked on two ("Wiki" over "Remastered"). */
+export function lockup({ glyphs = GLYPHS, stacked = false } = {}) {
+  const scale = 100 / glyphs.capHeight;
+  const [wiki, rest] = glyphs.words;
+  const lean = Math.tan(-LEAN * Math.PI / 180) * 100;
+  const line = 100 + 18; // Baseline to baseline, stacked: the lines close, clear of the depth.
+  const join = glyphs.unitsPerEm * .015;
+  const place = (x, y) => `translate(${f(x)} ${f(y)}) scale(${scale.toFixed(5)})`;
+  const restAt = stacked ? [0, 100 + line] : [(wiki.width + join) * scale, 100];
+  const a = solid('wr-lock-wiki', [{ d: wiki.d, transform: place(0, 100) }], GREEN, { depth: stacked ? 8 : 10, rim: [1.6, 2] });
+  const b = solid('wr-lock-rest', [{ d: rest.d, transform: place(...restAt) }], WHITE, { depth: stacked ? 8 : 10, rim: [1.6, 2] });
+  const textWidth = stacked ? Math.max(wiki.width, rest.width) * scale : (wiki.width + join + rest.width) * scale;
+  const textHeight = stacked ? 100 + line + 10 : 110;
+  const iconSize = stacked ? textHeight * .9 : 190; // The icon's art fills about 80 % of its box.
+  const gap = stacked ? 34 : 12;
+  const pad = 6;
+  const width = Math.ceil(pad * 2 + iconSize + gap + textWidth + lean + 12);
+  const height = Math.ceil(Math.max(iconSize, textHeight) + pad * 2);
+  const inner = icon().replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '');
+  const textTop = pad + (height - pad * 2 - textHeight) / 2;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+  <!-- WikiRemastered lockup (${stacked ? 'stacked' : 'one line'}, ${glyphs.font}). Generated by scripts/brand.mjs. -->
+  <title>WikiRemastered</title>
+  <svg x="${pad}" y="${f((height - iconSize) / 2)}" width="${f(iconSize)}" height="${f(iconSize)}" viewBox="0 0 128 128">${inner}</svg>
+  <defs>${a.defs}${b.defs}${grain('wr-lock-grain')}</defs>
+  <g filter="url(#wr-lock-grain)">
+    <g transform="translate(${f(pad + iconSize + gap + lean)} ${f(textTop)}) skewX(${LEAN})">${a.body}${b.body}</g>
+  </g>
+</svg>
+`;
+}
+
+/* The menu's lockup: the two words stacked and aligned, the big icon over their left edge, in
+   front of them, its shadow falling on the first letters. Units: the wordmark's capitals are
+   100 tall; `at` tunes the numbers. */
+export function staggered({ glyphs = GLYPHS, at = {} } = {}) {
+  const o = { icon: 300, textX: 268, line: 118, ...at };
+  const scale = 100 / glyphs.capHeight;
+  const [wiki, rest] = glyphs.words;
+  const pad = 6;
+  const slant = Math.tan(-LEAN * Math.PI / 180);
+  // The words centred on the icon's height; the slant pivots on their middle.
+  const top = pad + (o.icon - 100 - o.line) / 2;
+  const middle = top + (100 + o.line) / 2;
+  const place = (y) => `translate(${f(o.textX)} ${f(y)}) scale(${scale.toFixed(5)})`;
+  const a = solid('wr-stag-wiki', [{ d: wiki.d, transform: place(top + 100) }], GREEN, { depth: 9, rim: [1.6, 2] });
+  const b = solid('wr-stag-rest', [{ d: rest.d, transform: place(top + 100 + o.line) }], WHITE, { depth: 9, rim: [1.6, 2] });
+  const right = o.textX + Math.max(wiki.width, rest.width) * scale + slant * (middle - top) + 14;
+  // No margin on the left: the view starts at the piece's edge (12.5 of the icon's 128).
+  const trim = Math.floor(pad + o.icon * 12.5 / 128);
+  const width = Math.ceil(pad + right) - trim;
+  const height = Math.ceil(pad * 2 + o.icon);
+  const inner = icon().replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '');
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="${trim} 0 ${width} ${height}">
+  <!-- WikiRemastered lockup (compact, ${glyphs.font}). Generated by scripts/brand.mjs. -->
+  <title>WikiRemastered</title>
+  <defs>${a.defs}${b.defs}${grain('wr-stag-grain')}
+    <filter id="wr-stag-lift" x="-20%" y="-20%" width="150%" height="150%">
+      <feDropShadow dx="7" dy="9" stdDeviation="7" flood-color="#050807" flood-opacity=".6"/>
+    </filter>
+  </defs>
+  <g filter="url(#wr-stag-grain)">
+    <g transform="translate(${f(slant * middle)} 0) skewX(${LEAN})">${a.body}${b.body}</g>
+  </g>
+  <g filter="url(#wr-stag-lift)">
+    <svg x="${pad}" y="${pad}" width="${o.icon}" height="${o.icon}" viewBox="0 0 128 128">${inner}</svg>
   </g>
 </svg>
 `;
@@ -210,24 +282,46 @@ function tile(width, height, { line = '', logoWidth, iconSize, packHeight, left,
 `;
 }
 
-// node scripts/brand.mjs --compare a.json b.json…: the logo in each face, side by side (lab).
-const compare = process.argv.indexOf('--compare');
-if (compare > 0) {
-  const rows = process.argv.slice(compare + 1).map(file => {
-    const glyphs = JSON.parse(readFileSync(file, 'utf8'));
-    return `<figure><img src="data:image/svg+xml;base64,${Buffer.from(logo(glyphs)).toString('base64')}"><figcaption>${glyphs.font}</figcaption></figure>`;
-  });
-  writeFileSync(at('lab/brand-compare.html'), `<!doctype html><meta charset="utf-8"><title>Logo faces</title>
-<style>body{margin:0;padding:24px;background:#0c0d0c;color:#8a948f;font:12px system-ui;display:grid;gap:18px}figure{margin:0;display:grid;gap:6px}img{height:64px;justify-self:start}</style>
-${rows.join('\n')}`);
-  console.log('lab/brand-compare.html written');
-  process.exit(0);
-}
+// Run as a script (not imported, as the film does): write the files.
+if (import.meta.url === pathToFileURL(process.argv[1]).href) main();
 
-mkdirSync(at('store/images'), { recursive: true });
-writeFileSync(at('extension/logo-wikiremastered.svg'), logo());
-writeFileSync(at('extension/icon.svg'), icon());
-writeFileSync(at('store/images/promo-small-440x280.svg'), tile(440, 280, { logoWidth: 250, iconSize: 64, packHeight: 230, left: 26, packX: 300 }));
-writeFileSync(at('store/images/promo-marquee-1400x560.svg'), tile(1400, 560, { line: 'Ouvertures de paquets en 3D, collection enrichie, marché et paquets AFK', logoWidth: 700, iconSize: 120, packHeight: 470, left: 110, packX: 930 }));
-const [, logoWidth, logoHeight] = logo().match(/width="(\d+)" height="(\d+)"/);
-console.log(`logo ${logoWidth} × ${logoHeight}, icon and store tiles written`);
+function main() {
+  // node scripts/brand.mjs --compare a.json b.json…: the logo in each face, side by side (lab).
+  const compare = process.argv.indexOf('--compare');
+  if (compare > 0) {
+    const rows = process.argv.slice(compare + 1).filter(arg => !arg.startsWith('--')).map(file => {
+      const glyphs = JSON.parse(readFileSync(file, 'utf8'));
+      return `<figure><img src="data:image/svg+xml;base64,${Buffer.from(logo(glyphs)).toString('base64')}"><figcaption>${glyphs.font}</figcaption></figure>`;
+    });
+    // With --lockups, the compact lockups instead, as they would sit in the site's menu.
+    if (process.argv.includes('--lockups')) {
+      const files = process.argv.slice(compare + 1).filter(arg => !arg.startsWith('--'));
+      const variants = [];
+      for (const file of files) {
+        const glyphs = JSON.parse(readFileSync(file, 'utf8'));
+        for (const stacked of [false, true]) variants.push({ label: `${glyphs.font}, ${stacked ? 'deux lignes' : 'une ligne'}`, svg: lockup({ glyphs, stacked }) });
+      }
+      const cells = variants.map(({ label, svg }) => `<figure><div class="side"><img src="data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}"><i></i></div><figcaption>${label}</figcaption></figure>`);
+      writeFileSync(at('lab/brand-lockups.html'), `<!doctype html><meta charset="utf-8"><title>Lockups</title>
+  <style>body{margin:0;padding:20px;background:#0c0d0c;color:#8a948f;font:12px system-ui;display:grid;grid-template-columns:repeat(2,300px);gap:14px 24px}figure{margin:0;display:grid;gap:6px}.side{display:flex;align-items:center;justify-content:space-between;width:280px;height:64px;padding:0 16px;background:#121413;border:1px solid #1f2321;border-radius:6px;box-sizing:border-box}.side img{height:34px;max-width:210px;object-fit:contain;object-position:left}.side i{width:20px;height:20px;border-radius:50%;background:#2b2f2d;flex:none}</style>
+  ${cells.join('\n')}`);
+      console.log('lab/brand-lockups.html written');
+      return;
+    }
+    writeFileSync(at('lab/brand-compare.html'), `<!doctype html><meta charset="utf-8"><title>Logo faces</title>
+  <style>body{margin:0;padding:24px;background:#0c0d0c;color:#8a948f;font:12px system-ui;display:grid;gap:18px}figure{margin:0;display:grid;gap:6px}img{height:64px;justify-self:start}</style>
+  ${rows.join('\n')}`);
+    console.log('lab/brand-compare.html written');
+    return;
+  }
+
+  mkdirSync(at('store/images'), { recursive: true });
+  writeFileSync(at('extension/logo-wikiremastered.svg'), logo());
+  writeFileSync(at('extension/icon.svg'), icon());
+  writeFileSync(at('extension/logo-wikiremastered-compact.svg'), staggered());
+  writeFileSync(at('store/images/promo-small-440x280.svg'), tile(440, 280, { logoWidth: 250, iconSize: 64, packHeight: 230, left: 26, packX: 300 }));
+  writeFileSync(at('store/images/promo-marquee-1400x560.svg'), tile(1400, 560, { line: 'Ouvertures de paquets en 3D, collection enrichie, défausse et marché', logoWidth: 700, iconSize: 120, packHeight: 470, left: 110, packX: 930 }));
+  const [, logoWidth, logoHeight] = logo().match(/width="(\d+)" height="(\d+)"/);
+  const [, lockWidth, lockHeight] = staggered().match(/width="(\d+)" height="(\d+)"/);
+  console.log(`logo ${logoWidth} × ${logoHeight}, compact lockup ${lockWidth} × ${lockHeight}, icon and store tiles written`);
+}

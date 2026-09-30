@@ -24,8 +24,7 @@
   import(chrome.runtime.getURL('content.js')).catch(() => {
     if (location.pathname.replace(/\/$/, '') === '/collection') requireReload();
   });
-  import(chrome.runtime.getURL('afk.js')).catch(() => {});
   import(chrome.runtime.getURL('pack-opening.js'))
-    .then(({ installPackOpening }) => installPackOpening({ cssUrl: chrome.runtime.getURL('pack-opening.css'), packUrl: chrome.runtime.getURL('pack-art.svg'), puzzleUrl: chrome.runtime.getURL('pack-art-puzzle.svg'), puzzleBackUrl: chrome.runtime.getURL('card-back-puzzle.svg') }))
+    .then(({ installPackOpening }) => installPackOpening({ cssUrl: chrome.runtime.getURL('pack-opening.css'), packUrl: chrome.runtime.getURL('pack-art.svg'), puzzleUrl: chrome.runtime.getURL('pack-art-puzzle.svg'), puzzleBackUrl: chrome.runtime.getURL('card-back-puzzle.svg'), greenUrl: chrome.runtime.getURL('pack-art-green.svg'), greenBackUrl: chrome.runtime.getURL('card-back-green.svg'), globeUrl: chrome.runtime.getURL('pack-art-globe.svg'), globeBackUrl: chrome.runtime.getURL('card-back-globe.svg') }))
     .catch(() => {});
 })();

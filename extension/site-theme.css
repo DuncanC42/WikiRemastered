@@ -576,11 +576,17 @@ html[data-wme-theme='graphite'] [data-wme-reveal-pages] > button[data-wme-page-a
 }
 
 /* Normal pack: the extension's art replaces the rendered image only, in the design picked in the
-   opening (the puzzle pack by default, the dark foil one, or the site's own).
+   opening (the puzzle pack by default, the green one, the white one, the dark foil one, or the site's own).
    The native <img>, its src, handlers and reveal animations are untouched. */
 html[data-wme-theme='graphite']:not([data-wme-pack-style='classic']) main button img[alt='Ouvrir un paquet'] {
   content: url('chrome-extension://__MSG_@@extension_id__/pack-art-puzzle.svg');
   filter: drop-shadow(0 18px 22px rgb(0 0 0 / 50%)) !important;
+}
+html[data-wme-theme='graphite'][data-wme-pack-style='green'] main button img[alt='Ouvrir un paquet'] {
+  content: url('chrome-extension://__MSG_@@extension_id__/pack-art-green.svg');
+}
+html[data-wme-theme='graphite'][data-wme-pack-style='globe'] main button img[alt='Ouvrir un paquet'] {
+  content: url('chrome-extension://__MSG_@@extension_id__/pack-art-globe.svg');
 }
 html[data-wme-theme='graphite'][data-wme-pack-style='dark'] main button img[alt='Ouvrir un paquet'] {
   content: url('chrome-extension://__MSG_@@extension_id__/pack-art.svg');
@@ -600,6 +606,19 @@ html[data-wme-theme='graphite'] [data-wme-logo] {
   color: transparent !important;
   white-space: nowrap;
   vertical-align: middle;
+}
+/* In the menu, the compact lockup: the name on two lines, the big icon in front of their left
+   edge (1187 × 312, from scripts/brand.mjs). */
+html[data-wme-theme='graphite'] [data-wme-logo='compact'] {
+  width: calc(1.8em * 1187 / 312);
+  height: 1.8em;
+  background-image: url('chrome-extension://__MSG_@@extension_id__/logo-wikiremastered-compact.svg');
+}
+/* The menu's head row (flex justify-between gap-2 mb-8): 8 px on its sides, whatever the site
+   sets. */
+html[data-wme-theme='graphite'] .flex.justify-between.mb-8:has([data-wme-logo='compact']) {
+  padding-left: 8px !important;
+  padding-right: 8px !important;
 }
 html[data-wme-theme='graphite'] [data-wme-logo] > span {
   position: absolute;

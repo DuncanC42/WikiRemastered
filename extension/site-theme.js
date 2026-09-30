@@ -222,7 +222,9 @@
       const next = span.nextElementSibling;
       const parent = span.parentElement;
       if (!parent || next?.tagName !== 'SPAN' || next.textContent !== 'Masters' || parent.children.length !== 2 || excluded(parent)) continue;
-      mark(parent, 'data-wme-logo');
+      // In the menu (the sidebar, the mobile bar) the compact lockup, the icon beside the name on
+      // two lines; elsewhere (the login page) the full wordmark.
+      mark(parent, 'data-wme-logo', parent.closest('nav, aside, header') ? 'compact' : 'full');
     }
   }
 

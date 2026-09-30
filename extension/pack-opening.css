@@ -316,7 +316,7 @@ dialog::backdrop { background: transparent; }
 }
 .pack-wall.left { left: calc(var(--x, 2.5%) - var(--depth) * var(--wme-inflate, 1) / 2); transform: rotateZ(var(--lean, 0deg)) rotateY(90deg); }
 .pack-wall.right { left: calc(100% - var(--x, 2.5%) - var(--depth) * var(--wme-inflate, 1) / 2); transform: rotateZ(calc(var(--lean, 0deg) * -1)) rotateY(-90deg); }
-/* The puzzle pack is printed on one flat marigold: its back and sides are that paper too. */
+/* The drawn packs are printed on one flat paper: their back and sides are that paper too. */
 .root[data-pack-style="puzzle"] .pack-face[data-side="back"] .band {
   background:
     linear-gradient(180deg, rgb(255 255 255 / .1), transparent 26%, transparent 74%, rgb(150 80 0 / .2)),
@@ -326,6 +326,26 @@ dialog::backdrop { background: transparent; }
   background-image:
     linear-gradient(180deg, rgb(255 255 255 / .12), transparent 18%, transparent 82%, rgb(150 80 0 / .28)),
     linear-gradient(90deg, #c98210, #f4b12b 50%, #c98210);
+}
+.root[data-pack-style="green"] .pack-face[data-side="back"] .band {
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / .08), transparent 26%, transparent 74%, rgb(0 40 25 / .25)),
+    linear-gradient(90deg, #11724a, #17895a 8%, #1c9a66 32%, #198e5e 58%, #168655 84%, #11724a);
+}
+.root[data-pack-style="green"] .pack-wall {
+  background-image:
+    linear-gradient(180deg, rgb(255 255 255 / .1), transparent 18%, transparent 82%, rgb(0 40 25 / .3)),
+    linear-gradient(90deg, #0f6a44, #1b9563 50%, #0f6a44);
+}
+.root[data-pack-style="globe"] .pack-face[data-side="back"] .band {
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / .3), transparent 26%, transparent 74%, rgb(120 110 90 / .18)),
+    linear-gradient(90deg, #d9d3c4, #ece7dc 8%, #f7f4ec 32%, #f1ede3 58%, #e9e4d8 84%, #d9d3c4);
+}
+.root[data-pack-style="globe"] .pack-wall {
+  background-image:
+    linear-gradient(180deg, rgb(255 255 255 / .35), transparent 18%, transparent 82%, rgb(120 110 90 / .25)),
+    linear-gradient(90deg, #cfc8b7, #f1ede3 50%, #cfc8b7);
 }
 .root[data-pack-style="classic"] .pack-face[data-side="back"],
 .root[data-pack-style="classic"] .pack-wall { display: none; }
@@ -422,9 +442,9 @@ dialog::backdrop { background: transparent; }
   animation: guide-travel 2.8s cubic-bezier(.45, .05, .35, 1) infinite;
 }
 .scissors-body { position: absolute; inset: 0; animation: guide-fade 2.8s linear infinite; }
-/* Coral on the yellow puzzle pack, the site's green on the others (the cursor follows, in JS). */
+/* Coral on the drawn packs (yellow, green, white), the site's green on the others (the cursor follows, in JS). */
 .root { --sc-handle: #34c98e; --sc-deep: #1d8a5c; }
-.root[data-pack-style="puzzle"] { --sc-handle: #ff5a4c; --sc-deep: #b3322b; }
+.root[data-pack-style="puzzle"], .root[data-pack-style="green"], .root[data-pack-style="globe"] { --sc-handle: #ff5a4c; --sc-deep: #b3322b; }
 .guide-scissors svg { display: block; width: 100%; height: 100%; overflow: visible; }
 .guide-scissors .half { transform-box: view-box; transform-origin: 64px 30px; animation: snip-a .34s ease-in-out infinite alternate; }
 .guide-scissors .half-b { animation-name: snip-b; }
@@ -537,8 +557,24 @@ dialog::backdrop { background: transparent; }
     inset 0 0 0 1.6cqw #2c1f96,
     inset 0 0 0 calc(1.6cqw + 1px + var(--wme-charge, 0) * .8cqw) color-mix(in srgb, rgb(var(--c-rgb, 255 255 255)) var(--lit), rgb(255 242 210 / .3));
 }
+.root[data-pack-style="green"] .back {
+  background: var(--green-back, none) center / cover no-repeat, #11694a;
+  box-shadow:
+    inset 0 0 0 1.6cqw #0a4b34,
+    inset 0 0 0 calc(1.6cqw + 1px + var(--wme-charge, 0) * .8cqw) color-mix(in srgb, rgb(var(--c-rgb, 255 255 255)) var(--lit), rgb(247 240 220 / .3));
+}
+.root[data-pack-style="globe"] .back {
+  background: var(--globe-back, none) center / cover no-repeat, #1f4fae;
+  box-shadow:
+    inset 0 0 0 1.6cqw #133a86,
+    inset 0 0 0 calc(1.6cqw + 1px + var(--wme-charge, 0) * .8cqw) color-mix(in srgb, rgb(var(--c-rgb, 255 255 255)) var(--lit), rgb(247 240 220 / .3));
+}
+.root[data-pack-style="globe"] .back::before,
+.root[data-pack-style="globe"] .back .emblem,
 .root[data-pack-style="puzzle"] .back::before,
-.root[data-pack-style="puzzle"] .back .emblem { display: none; }
+.root[data-pack-style="puzzle"] .back .emblem,
+.root[data-pack-style="green"] .back::before,
+.root[data-pack-style="green"] .back .emblem { display: none; }
 /* Cards deeper in the pile sit in shade. */
 .back::after {
   content: "";

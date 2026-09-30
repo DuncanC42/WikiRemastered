@@ -2,8 +2,8 @@
   "manifest_version": 3,
   "name": "WikiRemastered pour Wiki Masters",
   "short_name": "WikiRemastered",
-  "version": "1.31.0",
-  "description": "Thème graphite, ouvertures de paquets en 3D, collection enrichie, marché et paquets AFK pour Wiki Masters. Extension non officielle.",
+  "version": "1.33.0",
+  "description": "Thème graphite, ouvertures de paquets en 3D, collection enrichie, défausse et marché pour Wiki Masters. Extension non officielle.",
   "minimum_chrome_version": "120",
   "permissions": ["storage", "alarms"],
   "host_permissions": ["https://www.wiki-masters.com/*", "https://wiki-masters.com/*"],
@@ -32,7 +32,7 @@
     }
   ],
   "web_accessible_resources": [{
-    "resources": ["content.js", "api.js", "network.js", "prices.js", "discard.js", "protection.js", "ui.js", "ui.css", "controls.js", "help.js", "help.css", "duplicates.js", "duplicates.css", "afk.js", "afk-ui.js", "afk-ui.css", "pack-cards.js", "pack-opening.js", "pack-opening.css", "pack-art.svg", "pack-art-puzzle.svg", "card-back-puzzle.svg", "logo-wikiremastered.svg", "pack-fold.js", "pack-light.js", "market.js", "market-api.js", "market-policy.js", "market-ui.js", "market-ui.css", "late-bid-policy.js", "runtime.js"],
+    "resources": ["content.js", "api.js", "network.js", "prices.js", "discard.js", "protection.js", "ui.js", "ui.css", "controls.js", "help.js", "help.css", "duplicates.js", "duplicates.css", "pack-cards.js", "pack-opening.js", "pack-opening.css", "pack-art.svg", "pack-art-puzzle.svg", "card-back-puzzle.svg", "pack-art-green.svg", "card-back-green.svg", "pack-art-globe.svg", "card-back-globe.svg", "logo-wikiremastered.svg", "logo-wikiremastered-compact.svg", "pack-fold.js", "pack-light.js", "market.js", "market-api.js", "market-policy.js", "market-ui.js", "market-ui.css", "late-bid-policy.js", "runtime.js"],
     "matches": ["https://www.wiki-masters.com/*", "https://wiki-masters.com/*"]
   }]
 }

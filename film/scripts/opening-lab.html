@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Film · Ouverture</title>
+<!-- The lab's opening (lab/pack-opening.html), for the film: served by scripts/capture.mjs at
+     /lab/film-opening.html, with one pack whose five cards all show their real picture. -->
+<style>
+  :root { color-scheme: dark; --font-heading: "Outfit", system-ui, sans-serif; }
+  body { margin: 0; min-height: 100dvh; display: grid; place-items: center; background: #0b0c0c; }
+  #pack { background: none; border: 0; padding: 0; }
+  #pack img { height: 256px; opacity: 0; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+<button id="pack" type="button"><img alt="" src="../extension/pack-art-puzzle.svg"></button>
+<script type="module">
+import { openPackExperience } from '../extension/pack-opening.js';
+import { normalizePackResponse } from '../extension/pack-cards.js';
+
+const ORIGIN = 'https://www.wiki-masters.com';
+const commons = path => `https://upload.wikimedia.org/wikipedia/commons/thumb/${path}`;
+// Common to legendary, in the order the server sends them.
+const HAND = [
+  { rarity: 'C', wikipedia_title: 'Flamant rose', category: "espèce d'oiseaux du genre Phoenicopterus", image_url: commons('a/ae/Flamant_Rose_Villeneuve-l%C3%A8s-Maguelone.jpg/500px-Flamant_Rose_Villeneuve-l%C3%A8s-Maguelone.jpg'), atk: 1940, def: 2310, pageviews: 912 },
+  { rarity: 'PC', wikipedia_title: 'Mont Fuji', category: 'volcan au sud-ouest de Tokyo, au Japon', image_url: commons('c/cd/Fuji_Kawaguchi_357.JPG/500px-Fuji_Kawaguchi_357.JPG'), atk: 3254, def: 4352, pageviews: 3410 },
+  { rarity: 'R', wikipedia_title: 'Saturne (planète)', category: 'sixième planète du Système solaire', image_url: commons('c/c7/Saturn_during_Equinox.jpg/500px-Saturn_during_Equinox.jpg'), atk: 5090, def: 7780, pageviews: 5820 },
+  { rarity: 'SR', wikipedia_title: 'Nébuleuse du Crabe', category: 'rémanent de supernova, dans la constellation du Taureau', image_url: commons('0/00/Crab_Nebula.jpg/500px-Crab_Nebula.jpg'), atk: 6222, def: 5935, pageviews: 3250 },
+  { rarity: 'L', wikipedia_title: 'Grande Muraille', category: 'Ensemble de fortifications militaires construites pour marquer et défendre la frontière nord de la Chine', image_url: `${ORIGIN}/cards/grande-muraille.jpg`, atk: 8970, def: 6120, pageviews: 142000 },
+];
+let stock = 7;
+let counter = 0;
+const uuid = n => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
+document.documentElement.setAttribute('data-wme-account', '00000000-0000-4000-8000-00000000a001');
+
+async function requestOpen() {
+  await new Promise(resolve => setTimeout(resolve, 700));
+  counter += 1;
+  const cards = HAND.map((card, index) => ({ id: `film-${counter}-${index}`, rarity_order: ['C', 'PC', 'R', 'SR', 'UR', 'L'].indexOf(card.rarity), hide_image: false, nsfw_image: false, lang: 'fr', summary: null, ...card }));
+  const result = normalizePackResponse({
+    cards,
+    packs_remaining: Math.max(0, stock - 1),
+    packs_last_regen_at: new Date().toISOString(),
+    owned_copies: cards.map((card, index) => ({ id: uuid(500 + counter * 10 + index), card_id: card.id, starred: false, is_shiny: false, user_card_tags: [] })),
+  });
+  stock = result.packsRemaining;
+  return result;
+}
+
+const cssText = await fetch('../extension/pack-opening.css').then(response => response.text());
+const packSvg = await fetch('../extension/pack-art.svg').then(response => response.text());
+const puzzleSvg = await fetch('../extension/pack-art-puzzle.svg').then(response => response.text());
+const greenSvg = await fetch('../extension/pack-art-green.svg').then(response => response.text());
+const globeSvg = await fetch('../extension/pack-art-globe.svg').then(response => response.text());
+
+window.launch = (packStyle = 'puzzle') => {
+  const image = document.querySelector('#pack img').getBoundingClientRect();
+  openPackExperience({
+    requestOpen, remaining: stock, sourceRect: image, packSvg, puzzleSvg, puzzleBack: new URL('../extension/card-back-puzzle.svg', location.href).href, greenSvg, greenBack: new URL('../extension/card-back-green.svg', location.href).href, globeSvg, globeBack: new URL('../extension/card-back-globe.svg', location.href).href, assetOrigin: ORIGIN, cssText, muted: true,
+    onMuteChange() {}, packStyle, onPackStyleChange() {}, antiSpoil: false, onAntiSpoilChange() {},
+    collectionPath: '/lab/collection-mock.html',
+    onClose(outcome, destroy) { destroy(); },
+  });
+};
+window.ready = true;
+</script>
+</body>
+</html>

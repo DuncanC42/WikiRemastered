@@ -65,26 +65,6 @@ const topics = {
       ['Garder le contrôle', 'Gardez un onglet Wiki Masters connecté et le navigateur ouverts. Arrêter bloque les prochains envois, sans annuler une mise déjà envoyée. Un résultat incertain doit être vérifié dans Mes enchères.'],
     ],
   },
-  afk: {
-    title: 'Ouvertures AFK',
-    summary: 'Quand votre stock atteint 10/10, l’extension ouvre un paquet pour ne rien perdre de la régénération.',
-    steps: [
-      ['Stock plein', 'Le site confirme que vous avez 10 paquets sur 10.'],
-      ['Un paquet ouvert', 'Un seul paquet normal, jamais un pack spécial ou quotidien.'],
-      ['Récapitulatif', 'Les cartes obtenues apparaissent dans Ouvertures AFK.'],
-    ],
-    points: [
-      ['Vérification humaine', 'Si le site la demande, le bouton devient jaune : terminez-la vous-même sur Paquets.'],
-      ['Navigateur ouvert', 'Gardez un onglet Wiki Masters connecté.'],
-      ['Priorité', 'Une ouverture manuelle passe toujours avant.'],
-    ],
-    intro: 'Libérez une place dès que votre stock atteint 10/10.',
-    sections: [
-      ['Un paquet à stock plein', 'Un seul paquet normal est ouvert quand le site confirme 10/10. Gardez le navigateur et un onglet Wiki Masters connecté ouverts. Une ouverture manuelle reste prioritaire.'],
-      ['Retrouver les cartes', 'Les cartes des 150 derniers paquets AFK restent dans le récapitulatif, séparément pour chaque compte. Vous pouvez désactiver les ouvertures à tout moment.'],
-      ['Vérification humaine', 'Le bouton devient jaune si le site demande votre présence. Cliquez sur Vérifier et terminez la vérification sur Paquets. L’extension ne la réalise pas à votre place.'],
-    ],
-  },
   duplicates: {
     title: 'Vos doublons',
     summary: 'Une pile réunit tous vos exemplaires d’une même carte, variantes comprises.',
