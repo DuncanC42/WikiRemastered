@@ -59,7 +59,7 @@ Améliorer l’interface et l’expérience du jeu Wiki Masters sur wiki-masters
 
 **Utilisation des données** (cases à cocher) : l’extension manipule du « contenu de site web » (la collection, le marché et les paquets de l’utilisateur sur wiki-masters.com), uniquement dans le navigateur. Elle ne collecte, ne vend et ne transmet aucune donnée au développeur ni à un tiers. Cocher les trois certifications (pas de vente, pas d’usage sans rapport avec l’objectif, pas d’usage pour la solvabilité).
 
-**Règles de confidentialité** : publier `store/privacy.md` à une adresse publique (GitHub Pages, un gist, un site) et coller son URL.
+**Règles de confidentialité** : https://lypningeuh.github.io/WikiRemastered/store/privacy.html (publié par GitHub Pages depuis `store/privacy.md` ; si besoin, la version GitHub : https://github.com/Lypningeuh/WikiRemastered/blob/main/store/privacy.md).
 
 ## À vérifier avant de publier
 
