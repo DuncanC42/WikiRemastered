@@ -1,0 +1,7 @@
+<!doctype html><meta charset="utf-8"><title>Pack art preview</title>
+<style>body{margin:0;background:#141416;display:flex;gap:28px;align-items:center;justify-content:center;min-height:100vh}img{height:92vh;filter:drop-shadow(0 18px 22px rgb(0 0 0/50%))}body.big{display:block}body.big img{height:auto;width:calc(640px * var(--z))}</style>
+<img id="a" src="../extension/pack-art-puzzle.svg" alt=""><img id="b" src="../extension/pack-art.svg" alt="" style="height:46vh">
+<script>
+const q = new URLSearchParams(location.search);
+if (q.get('z')) { document.body.classList.add('big'); document.body.style.setProperty('--z', q.get('z')); document.getElementById('b').remove(); addEventListener('load', () => scrollTo(Number(q.get('x') || 0), Number(q.get('y') || 0))); }
+</script>

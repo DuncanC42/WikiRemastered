@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Labo · Collection + et Marché +</title>
+<!-- Mounts the real Collection + / Marché + components with simulated state.
+     Serve the repository root with a no-cache static server. -->
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; background: #111113; color: #f5f5f7; font: 14px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; }
+  main { display: grid; gap: 28px; max-width: 1080px; margin: 0 auto; padding: 28px 20px 80px; }
+  h1 { margin: 0; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #71717a; }
+  .cards { display: flex; flex-wrap: wrap; gap: 18px; }
+  .card { width: 10rem; }
+  .card-face { aspect-ratio: 5 / 7; border-radius: 14px; background: linear-gradient(160deg, #d4f5e3, #b8e8cf); color: #000; padding: 10px; font-weight: 700; font-size: 12px; }
+  .card-face[data-r="R"] { background: linear-gradient(160deg, #e6dafb, #c6a7f2); }
+  .help-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .help-row button { font: inherit; color: #f5f5f7; background: #232327; border: 0; border-radius: 8px; padding: 8px 12px; cursor: pointer; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Collection +</h1>
+  <div id="collection"></div>
+  <div class="cards" id="cards"></div>
+  <h1>Marché +</h1>
+  <div id="market"></div>
+  <div class="cards" id="market-cards"></div>
+  <h1>Enchère forcée (fiche)</h1>
+  <div id="late"></div>
+  <h1>Aide</h1>
+  <div class="help-row" id="help"></div>
+</main>
+<script>
+  const memory = {};
+  window.chrome = {
+    runtime: { getURL: path => `/extension/${path}`, getManifest: () => ({ version: 'lab' }) },
+    storage: { local: {
+      get: async keys => Object.fromEntries([].concat(keys ?? Object.keys(memory)).filter(key => key in memory).map(key => [key, memory[key]])),
+      set: async values => { Object.assign(memory, values); },
+      remove: async keys => { for (const key of [].concat(keys)) delete memory[key]; },
+    }, onChanged: { addListener() {}, removeListener() {} } },
+  };
+</script>
+<script type="module">
+  const { createToolbar, createCardExtras } = await import('/extension/ui.js');
+  const { createMarketToolbar, createMarketExtras, createLateBidControls } = await import('/extension/market-ui.js');
+
+  const toolbar = createToolbar({ onDuplicates() {}, onBulk() { window.__openReview(); }, onBulkCancel() { toolbar.update({ review: null }); }, onStop() {}, onRefresh() {},
+    onReviewExclude(ids) { ids.forEach(id => excluded.add(id)); pushReview(); }, onReviewRestore(ids) { if (ids) ids.forEach(id => excluded.delete(id)); else excluded.clear(); pushReview(); },
+    onRaritiesChange(r) { toolbar.update({ rarities: r }); } });
+  document.getElementById('collection').append(toolbar.element);
+  toolbar.update({ phase: 'ready', eligible: 37, total: 412, threshold: 30, scope: 'collection', blockedWords: ['chanteur', 'musique'], duplicateGroups: 12,
+    rarities: ['C', 'PC', 'R'], rarityCounts: { C: 24, PC: 9, R: 4, SR: 2, UR: 0, L: 0 } });
+  const reviewAll = [['Gabriel Zendel', 'peintre et lithographe français (1906-1992)', 'C', 3], ['Sheik (homonymie)', "page d'homonymie de Wikimédia", 'C', 5],
+    ['Adieu je reste !', 'pièce de théâtre', 'PC', 7], ['Patrick Ouotro', 'footballeur ivoirien', 'C', 9], ['Volcan Taal', 'volcan des Philippines', 'R', 12],
+    ['Jazz manouche', 'genre musical', 'PC', 18], ['Rue Oberkampf', 'voie de Paris', 'C', 21], ['Lac de Vassivière', 'lac de barrage en France', 'C', 27]]
+    .map(([title, category, rarity, views], i) => ({ id: `r${i}`, title, category, rarity, views }));
+  const excluded = new Set();
+  const pushReview = () => toolbar.update({ review: reviewAll.map(item => ({ ...item, excluded: excluded.has(item.id) })) });
+  window.__openReview = pushReview;
+
+
+  const samples = [
+    { views: 15, price: 12, copyCount: 1 },
+    { views: 4120, price: 38, copyCount: 3, r: 'R' },
+    { views: null, price: null, loading: true },
+    { views: 8, price: null, priceStatus: 'Prix indisponible', protected: true, protectedReason: 'Favori' },
+  ];
+  for (const sample of samples) {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `<div class="card-face" data-r="${sample.r || 'C'}">Carte</div>`;
+    const extras = createCardExtras({ onDiscard() {}, onRetry() {}, onDuplicates() {} });
+    extras.update({ loading: false, ...sample });
+    card.append(extras.element);
+    document.getElementById('cards').append(card);
+  }
+
+  let plans = [];
+  const market = createMarketToolbar({ onStart: async () => {}, onStop: async () => {}, onSettingsChange() {}, onLateStop: async () => {},
+    onLateDismiss: async id => { await new Promise(r => setTimeout(r, 300)); plans = plans.filter(plan => plan.id !== id); market.update({ latePlans: plans }); } });
+  document.getElementById('market').append(market.element);
+  const now = Date.now();
+  market.update({
+    accountReady: true, active: true, used: 23,
+    settings: { keywords: ['peintre', 'jazz', 'volcan'], maxBid: 10, budget: 50, intervalSeconds: 60, maxRemainingMinutes: 5, allowRebids: true },
+    status: 'Recherche toutes les 60 s · prochaine dans 42 s.',
+    entries: Array.from({ length: 14 }, (_, i) => ({ title: ['Gabriel Zendel', 'Miles Davis', 'Volcan Taal', 'Jazz manouche', 'Peinture rupestre'][i % 5], amount: 8 + i, status: i === 1 ? 'unknown' : 'success', at: now - i * 420_000 })),
+    latePlans: plans = [
+      { id: '11111111-1111-4111-8111-111111111111', title: 'Grande Muraille', maxBid: 120, status: 'watching', active: true, endAt: now + 3_600_000, runId: 1 },
+      { id: '22222222-2222-4222-8222-222222222222', title: 'Miles Davis', maxBid: 60, status: 'uncertain', active: false, updatedAt: now, runId: 1, message: 'Dernière mise à vérifier dans Mes enchères.' },
+      { id: '33333333-3333-4333-8333-333333333333', title: 'Ada Lovelace', maxBid: 45, status: 'won', active: false, updatedAt: now - 1000, runId: 1 },
+      { id: '44444444-4444-4444-8444-444444444444', title: 'Volcan Taal', maxBid: 30, status: 'cancelled', active: false, updatedAt: now - 2000, runId: 1 },
+    ],
+  });
+
+  for (const late of [null, { id: 'x', maxBid: 80, status: 'leading', active: true, runId: 1 }]) {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = '<div class="card-face" data-r="R">Enchère</div>';
+    const extras = createMarketExtras({ onLateSet: async () => {}, onLateStop: async () => {} });
+    extras.update({ views: 3250, price: { status: 'ready', value: { price: 42, source: 'average' } }, latePlan: late, lateAvailable: true, metrics: Boolean(late) });
+    card.append(extras.element);
+    document.getElementById('market-cards').append(card);
+  }
+
+  const detail = createLateBidControls({ onLateSet: async () => {}, onLateStop: async () => {}, detail: true });
+  document.getElementById('late').append(detail.element);
+  detail.update({ latePlan: null, lateAvailable: true });
+
+  const { openHelp } = await import('/extension/help.js');
+  for (const topic of ['collection', 'market', 'late', 'afk', 'duplicates']) {
+    const button = document.createElement('button');
+    button.textContent = topic;
+    button.addEventListener('click', () => openHelp(topic, button));
+    document.getElementById('help').append(button);
+  }
+  // Duplicates: rows in the real /api/my-collection shape.
+  const { createDuplicateBrowser } = await import('/extension/duplicates.js');
+  const duplicates = createDuplicateBrowser();
+  const rows = new Map();
+  const art = { 'Ada Lovelace': 'https://www.wiki-masters.com/cards/ada-lovelace.png', 'Abeille': 'https://www.wiki-masters.com/cards/abeille.jpg', 'Grande Muraille': 'https://www.wiki-masters.com/cards/grande-muraille.jpg' };
+  let n = 0;
+  for (const [title, rarities] of [['Ada Lovelace', ['R', 'C', 'C']], ['Abeille', ['PC', 'C', 'C', 'C', 'C']], ['Grande Muraille', ['L', 'UR']], ['Gabriel Zendel', ['C', 'C']], ['Patrick Ouotro', ['SR', 'PC', 'C']]]) {
+    rarities.forEach((rarity, index) => {
+      const id = `00000000-0000-4000-8000-${String(++n).padStart(12, '0')}`;
+      rows.set(id, { id, snapshot_rarity: rarity, is_shiny: index === 1 && rarity === 'C', card: { id: title, wikipedia_title: title, rarity, image_url: art[title] || null, atk: 1200 + n * 97, def: 900 + n * 61, pageviews: 40 * n } });
+    });
+  }
+  duplicates.update(rows, true);
+  const open = document.createElement('button');
+  open.textContent = 'doublons';
+  open.addEventListener('click', () => duplicates.open());
+  document.getElementById('help').append(open);
+  window.__lab = { toolbar, market, openHelp, duplicates };
+</script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+.DS_Store
+dist/
+# Personal: a session cookie captured while studying the site, and an internal design guide.
+extension/Note-cookie.md
+guide-design-composants.md

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="fr" data-wme-theme="graphite">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Labo · Filtres du marché</title>
+<!-- Native-like marketplace filter bar with the real site-theme.css and
+     integration.css, to check the sort select and the "Vues et prix" switch. -->
+<link rel="stylesheet" href="../extension/site-theme.css">
+<link rel="stylesheet" href="../extension/integration.css">
+<style>
+  body { margin: 0; background: #151517; color: #f5f5f7; font: 14px -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; }
+  main { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
+  .bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .bar input, .bar select { border: 1px solid; border-radius: 8px; padding: 8px 12px; }
+  .bar input { flex: 1; min-width: 200px; }
+  .chip { padding: 8px 12px; border-radius: 8px; background: #232327; color: #a1a1aa; border: 0; font: inherit; }
+</style>
+</head>
+<body>
+<main>
+  <div class="bar">
+    <input data-wme-input placeholder="Rechercher une carte…">
+    <button class="chip">Toutes raretés</button>
+    <select data-wme-input><option>Récemment listés</option><option>Fin imminente</option><option>Prix croissant</option></select>
+  </div>
+</main>
+<script type="module">
+  window.chrome = { runtime: { id: 'lab' } };
+  const select = document.querySelector('select');
+  const label = document.createElement('label');
+  label.dataset.wme = 'market-metrics';
+  const control = document.createElement('button');
+  control.type = 'button'; control.setAttribute('role', 'switch'); control.setAttribute('aria-checked', 'false');
+  const text = document.createElement('span'); text.textContent = 'Vues et prix';
+  label.append(control, text);
+  control.addEventListener('click', () => control.setAttribute('aria-checked', String(control.getAttribute('aria-checked') !== 'true')));
+  select.after(label);
+</script>
+</body>
+</html>

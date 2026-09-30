@@ -1,0 +1,297 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="1000" viewBox="0 0 640 1000">
+  <!-- Wiki Masters · Collection + pack. Dark pillow foil, heat-sealed ends with
+       shoulders and creases, guilloché field, globe-puzzle seal and W monogram.
+       System fonts only, so it renders identically as an image. -->
+  <defs>
+    <linearGradient id="foil" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#060607"/>
+      <stop offset=".07" stop-color="#18181d"/>
+      <stop offset=".27" stop-color="#2a2a31"/>
+      <stop offset=".4" stop-color="#17171b"/>
+      <stop offset=".68" stop-color="#0f0f12"/>
+      <stop offset=".88" stop-color="#1e1e24"/>
+      <stop offset="1" stop-color="#060607"/>
+    </linearGradient>
+    <linearGradient id="sealFace" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#0c0c0e"/>
+      <stop offset=".22" stop-color="#2f2f36"/>
+      <stop offset=".45" stop-color="#1b1b20"/>
+      <stop offset=".75" stop-color="#34343c"/>
+      <stop offset="1" stop-color="#0c0c0e"/>
+    </linearGradient>
+    <linearGradient id="sealShadeTop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".08"/>
+      <stop offset=".6" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity=".45"/>
+    </linearGradient>
+    <linearGradient id="sealShadeBottom" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity=".06"/>
+      <stop offset=".6" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity=".5"/>
+    </linearGradient>
+    <pattern id="ridges" width="6" height="10" patternUnits="userSpaceOnUse">
+      <rect width="2" height="10" fill="#fff" fill-opacity=".08"/>
+      <rect x="3" width="1.2" height="10" fill="#000" fill-opacity=".3"/>
+    </pattern>
+    <linearGradient id="pinchTop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#000" stop-opacity=".75"/>
+      <stop offset=".35" stop-color="#000" stop-opacity=".25"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="pinchBottom" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#000" stop-opacity=".8"/>
+      <stop offset=".35" stop-color="#000" stop-opacity=".25"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="green" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#a7f3d0"/>
+      <stop offset=".45" stop-color="#34d399"/>
+      <stop offset="1" stop-color="#047857"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff3c4"/>
+      <stop offset=".35" stop-color="#e9c15a"/>
+      <stop offset=".6" stop-color="#fff6d0"/>
+      <stop offset="1" stop-color="#a87a22"/>
+    </linearGradient>
+    <linearGradient id="word" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset=".55" stop-color="#e4e4e7"/>
+      <stop offset="1" stop-color="#9f9fa8"/>
+    </linearGradient>
+    <radialGradient id="halo" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#34d399" stop-opacity=".38"/>
+      <stop offset=".5" stop-color="#34d399" stop-opacity=".08"/>
+      <stop offset="1" stop-color="#34d399" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="globe" cx=".38" cy=".3" r=".85">
+      <stop offset="0" stop-color="#2c2c33"/>
+      <stop offset=".6" stop-color="#0f0f12"/>
+      <stop offset="1" stop-color="#040405"/>
+    </radialGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".13"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="prism" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#b8f2d5"/>
+      <stop offset=".25" stop-color="#b1cff2"/>
+      <stop offset=".5" stop-color="#c6a7f2"/>
+      <stop offset=".75" stop-color="#ed6fa3"/>
+      <stop offset="1" stop-color="#ffe144"/>
+    </linearGradient>
+    <radialGradient id="fade" cx=".5" cy=".45" r=".55">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset=".7" stop-color="#fff" stop-opacity=".6"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <mask id="fadeMask"><rect width="640" height="1000" fill="url(#fade)"/></mask>
+    <filter id="soft" filterUnits="userSpaceOnUse" x="-20" y="-20" width="680" height="1040"><feGaussianBlur stdDeviation="3"/></filter>
+    <filter id="softer" filterUnits="userSpaceOnUse" x="-20" y="-20" width="680" height="1040"><feGaussianBlur stdDeviation="8"/></filter>
+    <clipPath id="bodyClip"><path id="bodyShape" d="M22 40 L22 72 C22 104 14 124 14 172 L14 828 C14 876 22 896 22 928 L22 960 L618 960 L618 928 C618 896 626 876 626 828 L626 172 C626 124 618 104 618 72 L618 40 Z"/></clipPath>
+    <clipPath id="sweepClip"><path d="M22 40 L22 72 C22 104 14 124 14 172 L14 828 C14 876 22 896 22 928 L22 960 L618 960 L618 928 C618 896 626 876 626 828 L626 172 C626 124 618 104 618 72 L618 40 Z"/><path d="M22 66 L22 14 L22 14 L30 4 L38 14 L46 4 L54 14 L62 4 L70 14 L78 4 L86 14 L94 4 L102 14 L110 4 L118 14 L126 4 L134 14 L142 4 L150 14 L158 4 L166 14 L174 4 L182 14 L190 4 L198 14 L206 4 L214 14 L222 4 L230 14 L238 4 L246 14 L254 4 L262 14 L270 4 L278 14 L286 4 L294 14 L302 4 L310 14 L318 4 L326 14 L334 4 L342 14 L350 4 L358 14 L366 4 L374 14 L382 4 L390 14 L398 4 L406 14 L414 4 L422 14 L430 4 L438 14 L446 4 L454 14 L462 4 L470 14 L478 4 L486 14 L494 4 L502 14 L510 4 L518 14 L526 4 L534 14 L542 4 L550 14 L558 4 L566 14 L574 4 L582 14 L590 4 L598 14 L606 4 L614 14 L618 66 Z"/><path d="M22 934 L618 934 L618 986 L618 986 L610 996 L602 986 L594 996 L586 986 L578 996 L570 986 L562 996 L554 986 L546 996 L538 986 L530 996 L522 986 L514 996 L506 986 L498 996 L490 986 L482 996 L474 986 L466 996 L458 986 L450 996 L442 986 L434 996 L426 986 L418 996 L410 986 L402 996 L394 986 L386 996 L378 986 L370 996 L362 986 L354 996 L346 986 L338 996 L330 986 L322 996 L314 986 L306 996 L298 986 L290 996 L282 986 L274 996 L266 986 L258 996 L250 986 L242 996 L234 986 L226 996 L218 986 L210 996 L202 986 L194 996 L186 986 L178 996 L170 986 L162 996 L154 986 L146 996 L138 986 L130 996 L122 986 L114 996 L106 986 L98 996 L90 986 L82 996 L74 986 L66 996 L58 986 L50 996 L42 986 L34 996 L26 986 L22 986 Z"/></clipPath>
+    <clipPath id="globeClip"><circle cx="320" cy="450" r="106"/></clipPath>
+      <linearGradient id="sweep" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".45" stop-color="#fff" stop-opacity=".16"/>
+      <stop offset=".55" stop-color="#fff" stop-opacity=".05"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+  <!--cut-->
+    <mask id="foldCut" maskUnits="userSpaceOnUse" x="0" y="0" width="640" height="1000">
+      <rect width="640" height="1000" fill="#fff"/>
+      <path d="M410.0 -88.0 L700.0 -60.0 L774.0 150.0 Z" fill="#000"/>
+    </mask>
+    <clipPath id="foldClip"><rect x="22" y="0" width="596" height="1000"/></clipPath>
+  <!--/cut-->
+  </defs>
+  <g mask="url(#foldCut)">
+
+  <!-- Pillow body: shoulders bulge out from the flat seals. -->
+  <path fill="url(#foil)" d="M22 40 L22 72 C22 104 14 124 14 172 L14 828 C14 876 22 896 22 928 L22 960 L618 960 L618 928 C618 896 626 876 626 828 L626 172 C626 124 618 104 618 72 L618 40 Z"/>
+  <g clip-path="url(#bodyClip)">
+    <circle cx="320" cy="450" r="330" fill="url(#halo)"/>
+    <g fill="none" stroke="#fff" stroke-opacity=".045" stroke-width="1" mask="url(#fadeMask)">
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(0.00 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(3.75 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(7.50 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(11.25 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(15.00 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(18.75 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(22.50 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(26.25 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(30.00 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(33.75 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(37.50 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(41.25 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(45.00 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(48.75 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(52.50 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(56.25 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(60.00 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(63.75 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(67.50 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(71.25 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(75.00 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(78.75 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(82.50 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(86.25 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(90.00 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(93.75 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(97.50 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(101.25 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(105.00 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(108.75 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(112.50 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(116.25 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(120.00 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(123.75 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(127.50 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(131.25 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(135.00 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(138.75 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(142.50 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(146.25 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(150.00 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(153.75 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(157.50 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(161.25 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(165.00 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(168.75 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(172.50 320 450)"/>
+      <ellipse cx="320" cy="450" rx="300" ry="118" transform="rotate(176.25 320 450)"/>
+    </g>
+    <g fill="none" stroke="#34d399" stroke-opacity=".16" stroke-width="1">
+      <polyline points="516.0,450.0 518.7,460.4 519.7,471.0 518.3,481.4 514.6,491.4 509.3,500.7 503.6,509.7 498.5,518.5 494.7,527.8 492.0,537.6 489.7,548.0 486.8,558.3 482.4,568.0 476.0,576.3 467.8,583.1 458.6,588.6 449.2,593.5 440.4,598.6 432.4,604.7 425.1,611.9 418.0,619.7 410.3,627.3 401.7,633.4 391.9,637.4 381.5,639.2 370.7,639.3 360.1,638.8 349.9,638.9 340.0,640.2 330.1,642.8 320.0,646.0 309.6,648.7 299.0,649.7 288.6,648.3 278.6,644.6 269.3,639.3 260.3,633.6 251.5,628.5 242.2,624.7 232.4,622.0 222.0,619.7 211.7,616.8 202.0,612.4 193.7,606.0 186.9,597.8 181.4,588.6 176.5,579.2 171.4,570.4 165.3,562.4 158.1,555.1 150.3,548.0 142.7,540.3 136.6,531.7 132.6,521.9 130.8,511.5 130.7,500.7 131.2,490.1 131.1,479.9 129.8,470.0 127.2,460.1 124.0,450.0 121.3,439.6 120.3,429.0 121.7,418.6 125.4,408.6 130.7,399.3 136.4,390.3 141.5,381.5 145.3,372.2 148.0,362.4 150.3,352.0 153.2,341.7 157.6,332.0 164.0,323.7 172.2,316.9 181.4,311.4 190.8,306.5 199.6,301.4 207.6,295.3 214.9,288.1 222.0,280.3 229.7,272.7 238.3,266.6 248.1,262.6 258.5,260.8 269.3,260.7 279.9,261.2 290.1,261.1 300.0,259.8 309.9,257.2 320.0,254.0 330.4,251.3 341.0,250.3 351.4,251.7 361.4,255.4 370.7,260.7 379.7,266.4 388.5,271.5 397.8,275.3 407.6,278.0 418.0,280.3 428.3,283.2 438.0,287.6 446.3,294.0 453.1,302.2 458.6,311.4 463.5,320.8 468.6,329.6 474.7,337.6 481.9,344.9 489.7,352.0 497.3,359.7 503.4,368.3 507.4,378.1 509.2,388.5 509.3,399.3 508.8,409.9 508.9,420.1 510.2,430.0 512.8,439.9 516.0,450.0"/>
+      <polyline points="535.7,450.0 537.8,461.4 537.8,472.9 535.3,484.1 530.7,494.8 525.1,504.9 519.6,514.8 515.1,524.9 511.9,535.4 509.4,546.5 506.8,557.9 503.0,568.8 497.2,578.7 489.4,587.2 480.1,594.1 470.1,600.1 460.4,606.0 451.5,612.4 443.5,619.9 435.8,628.3 427.9,636.8 419.0,644.4 409.1,650.1 398.1,653.5 386.6,654.8 374.9,655.1 363.6,655.3 352.7,656.4 342.0,658.9 331.1,662.3 320.0,665.7 308.6,667.8 297.1,667.8 285.9,665.3 275.2,660.7 265.1,655.1 255.2,649.6 245.1,645.1 234.6,641.9 223.5,639.4 212.1,636.8 201.2,633.0 191.3,627.2 182.8,619.4 175.9,610.1 169.9,600.1 164.0,590.4 157.6,581.5 150.1,573.5 141.7,565.8 133.2,557.9 125.6,549.0 119.9,539.1 116.5,528.1 115.2,516.6 114.9,504.9 114.7,493.6 113.6,482.7 111.1,472.0 107.7,461.1 104.3,450.0 102.2,438.6 102.2,427.1 104.7,415.9 109.3,405.2 114.9,395.1 120.4,385.2 124.9,375.1 128.1,364.6 130.6,353.5 133.2,342.1 137.0,331.2 142.8,321.3 150.6,312.8 159.9,305.9 169.9,299.9 179.6,294.0 188.5,287.6 196.5,280.1 204.2,271.7 212.1,263.2 221.0,255.6 230.9,249.9 241.9,246.5 253.4,245.2 265.1,244.9 276.4,244.7 287.3,243.6 298.0,241.1 308.9,237.7 320.0,234.3 331.4,232.2 342.9,232.2 354.1,234.7 364.8,239.3 374.9,244.9 384.8,250.4 394.9,254.9 405.4,258.1 416.5,260.6 427.9,263.2 438.8,267.0 448.7,272.8 457.2,280.6 464.1,289.9 470.1,299.9 476.0,309.6 482.4,318.5 489.9,326.5 498.3,334.2 506.8,342.1 514.4,351.0 520.1,360.9 523.5,371.9 524.8,383.4 525.1,395.1 525.3,406.4 526.4,417.3 528.9,428.0 532.3,438.9 535.7,450.0"/>
+      <polyline points="555.2,450.0 556.5,462.4 555.3,474.7 551.8,486.7 546.6,498.2 541.0,509.2 536.0,520.2 532.3,531.5 529.5,543.3 527.0,555.5 523.7,567.6 518.6,579.0 511.4,589.1 502.4,597.7 492.2,605.0 481.8,611.8 472.0,618.8 463.1,626.7 454.8,635.5 446.5,644.9 437.6,653.7 427.5,661.0 416.2,666.2 404.1,669.1 391.6,670.3 379.2,671.0 367.2,672.2 355.6,674.6 344.0,678.1 332.2,682.0 320.0,685.2 307.6,686.5 295.3,685.3 283.3,681.8 271.8,676.6 260.8,671.0 249.8,666.0 238.5,662.3 226.7,659.5 214.5,657.0 202.4,653.7 191.0,648.6 180.9,641.4 172.3,632.4 165.0,622.2 158.2,611.8 151.2,602.0 143.3,593.1 134.5,584.8 125.1,576.5 116.3,567.6 109.0,557.5 103.8,546.2 100.9,534.1 99.7,521.6 99.0,509.2 97.8,497.2 95.4,485.6 91.9,474.0 88.0,462.2 84.8,450.0 83.5,437.6 84.7,425.3 88.2,413.3 93.4,401.8 99.0,390.8 104.0,379.8 107.7,368.5 110.5,356.7 113.0,344.5 116.3,332.4 121.4,321.0 128.6,310.9 137.6,302.3 147.8,295.0 158.2,288.2 168.0,281.2 176.9,273.3 185.2,264.5 193.5,255.1 202.4,246.3 212.5,239.0 223.8,233.8 235.9,230.9 248.4,229.7 260.8,229.0 272.8,227.8 284.4,225.4 296.0,221.9 307.8,218.0 320.0,214.8 332.4,213.5 344.7,214.7 356.7,218.2 368.2,223.4 379.2,229.0 390.2,234.0 401.5,237.7 413.3,240.5 425.5,243.0 437.6,246.3 449.0,251.4 459.1,258.6 467.7,267.6 475.0,277.8 481.8,288.2 488.8,298.0 496.7,306.9 505.5,315.2 514.9,323.5 523.7,332.4 531.0,342.5 536.2,353.8 539.1,365.9 540.3,378.4 541.0,390.8 542.2,402.8 544.6,414.4 548.1,426.0 552.0,437.8 555.2,450.0"/>
+    </g>
+    <path d="M-40 780 L700 330 L700 350 L-40 800 Z" fill="url(#prism)" opacity=".08"/>
+    <path d="M-40 840 L700 390 L700 396 L-40 846 Z" fill="url(#prism)" opacity=".12"/>
+    <rect x="140" y="0" width="130" height="1000" fill="url(#sheen)" transform="skewX(-8)"/>
+    <!-- Pinch shadow under each seal, and foil creases fanning from the corners. -->
+    <rect x="0" y="60" width="640" height="100" fill="url(#pinchTop)"/>
+    <rect x="0" y="840" width="640" height="100" fill="url(#pinchBottom)"/>
+    <g stroke-linecap="round" fill="none">
+      <path d="M40 62 Q70 110 118 150" stroke="#fff" stroke-opacity=".07" stroke-width="3" filter="url(#soft)"/>
+      <path d="M44 64 Q76 104 120 136" stroke="#000" stroke-opacity=".45" stroke-width="2"/>
+      <path d="M600 62 Q570 110 522 150" stroke="#fff" stroke-opacity=".06" stroke-width="3" filter="url(#soft)"/>
+      <path d="M596 64 Q566 104 520 136" stroke="#000" stroke-opacity=".45" stroke-width="2"/>
+      <path d="M40 938 Q70 890 118 850" stroke="#fff" stroke-opacity=".06" stroke-width="3" filter="url(#soft)"/>
+      <path d="M44 936 Q76 896 120 864" stroke="#000" stroke-opacity=".45" stroke-width="2"/>
+      <path d="M600 938 Q570 890 522 850" stroke="#fff" stroke-opacity=".05" stroke-width="3" filter="url(#soft)"/>
+      <path d="M596 936 Q566 896 520 864" stroke="#000" stroke-opacity=".45" stroke-width="2"/>
+      <path d="M180 64 Q200 84 196 110" stroke="#000" stroke-opacity=".3" stroke-width="1.5"/>
+      <path d="M430 64 Q412 86 418 112" stroke="#000" stroke-opacity=".3" stroke-width="1.5"/>
+      <path d="M210 936 Q228 914 222 890" stroke="#000" stroke-opacity=".3" stroke-width="1.5"/>
+      <path d="M470 936 Q452 916 458 888" stroke="#000" stroke-opacity=".3" stroke-width="1.5"/>
+    </g>
+    <!-- Shoulder highlights: where the puffed foil catches the light. -->
+    <path d="M24 100 C21 122 19 142 19 180" stroke="#fff" stroke-opacity=".28" stroke-width="4" fill="none" filter="url(#soft)"/>
+    <path d="M24 900 C21 878 19 858 19 820" stroke="#fff" stroke-opacity=".16" stroke-width="4" fill="none" filter="url(#soft)"/>
+    <path d="M60 120 H580" stroke="#fff" stroke-opacity=".05" stroke-width="10" filter="url(#softer)"/>
+  </g>
+  <path d="M22 72 C22 104 14 124 14 172 L14 828 C14 876 22 896 22 928" stroke="#fff" stroke-opacity=".14" stroke-width="1.5" fill="none"/>
+  <path d="M618 72 C618 104 626 124 626 172 L626 828 C626 876 618 896 618 928" stroke="#000" stroke-opacity=".7" stroke-width="2.5" fill="none"/>
+
+  <!-- Heat-sealed ends: regular crimped teeth with lit facets, ribbed faces,
+       a clean lip and a pinch shadow where the foil puffs out. -->
+  <clipPath id="sealTopClip"><path d="M22 66 L22 14 L22 14 L30 4 L38 14 L46 4 L54 14 L62 4 L70 14 L78 4 L86 14 L94 4 L102 14 L110 4 L118 14 L126 4 L134 14 L142 4 L150 14 L158 4 L166 14 L174 4 L182 14 L190 4 L198 14 L206 4 L214 14 L222 4 L230 14 L238 4 L246 14 L254 4 L262 14 L270 4 L278 14 L286 4 L294 14 L302 4 L310 14 L318 4 L326 14 L334 4 L342 14 L350 4 L358 14 L366 4 L374 14 L382 4 L390 14 L398 4 L406 14 L414 4 L422 14 L430 4 L438 14 L446 4 L454 14 L462 4 L470 14 L478 4 L486 14 L494 4 L502 14 L510 4 L518 14 L526 4 L534 14 L542 4 L550 14 L558 4 L566 14 L574 4 L582 14 L590 4 L598 14 L606 4 L614 14 L618 66 Z"/></clipPath>
+  <clipPath id="sealBottomClip"><path d="M22 934 L618 934 L618 986 L618 986 L610 996 L602 986 L594 996 L586 986 L578 996 L570 986 L562 996 L554 986 L546 996 L538 986 L530 996 L522 986 L514 996 L506 986 L498 996 L490 986 L482 996 L474 986 L466 996 L458 986 L450 996 L442 986 L434 996 L426 986 L418 996 L410 986 L402 996 L394 986 L386 996 L378 986 L370 996 L362 986 L354 996 L346 986 L338 996 L330 986 L322 996 L314 986 L306 996 L298 986 L290 996 L282 986 L274 996 L266 986 L258 996 L250 986 L242 996 L234 986 L226 996 L218 986 L210 996 L202 986 L194 996 L186 986 L178 996 L170 986 L162 996 L154 986 L146 996 L138 986 L130 996 L122 986 L114 996 L106 986 L98 996 L90 986 L82 996 L74 986 L66 996 L58 986 L50 996 L42 986 L34 996 L26 986 L22 986 Z"/></clipPath>
+  <g clip-path="url(#bodyClip)">
+    <line x1="0" y1="72" x2="640" y2="72" stroke="#000" stroke-opacity=".75" stroke-width="10" filter="url(#soft)"/>
+    <line x1="0" y1="928" x2="640" y2="928" stroke="#000" stroke-opacity=".75" stroke-width="10" filter="url(#soft)"/>
+  </g>
+  <path d="M22 66 L22 14 L22 14 L30 4 L38 14 L46 4 L54 14 L62 4 L70 14 L78 4 L86 14 L94 4 L102 14 L110 4 L118 14 L126 4 L134 14 L142 4 L150 14 L158 4 L166 14 L174 4 L182 14 L190 4 L198 14 L206 4 L214 14 L222 4 L230 14 L238 4 L246 14 L254 4 L262 14 L270 4 L278 14 L286 4 L294 14 L302 4 L310 14 L318 4 L326 14 L334 4 L342 14 L350 4 L358 14 L366 4 L374 14 L382 4 L390 14 L398 4 L406 14 L414 4 L422 14 L430 4 L438 14 L446 4 L454 14 L462 4 L470 14 L478 4 L486 14 L494 4 L502 14 L510 4 L518 14 L526 4 L534 14 L542 4 L550 14 L558 4 L566 14 L574 4 L582 14 L590 4 L598 14 L606 4 L614 14 L618 66 Z" fill="url(#sealFace)"/>
+  <g clip-path="url(#sealTopClip)">
+    <rect x="0" y="0" width="640" height="80" fill="url(#ridges)"/>
+    <rect x="0" y="0" width="640" height="80" fill="url(#sealShadeTop)"/>
+    <path d="M22 14 L30 4 L30 16 Z M38 14 L46 4 L46 16 Z M54 14 L62 4 L62 16 Z M70 14 L78 4 L78 16 Z M86 14 L94 4 L94 16 Z M102 14 L110 4 L110 16 Z M118 14 L126 4 L126 16 Z M134 14 L142 4 L142 16 Z M150 14 L158 4 L158 16 Z M166 14 L174 4 L174 16 Z M182 14 L190 4 L190 16 Z M198 14 L206 4 L206 16 Z M214 14 L222 4 L222 16 Z M230 14 L238 4 L238 16 Z M246 14 L254 4 L254 16 Z M262 14 L270 4 L270 16 Z M278 14 L286 4 L286 16 Z M294 14 L302 4 L302 16 Z M310 14 L318 4 L318 16 Z M326 14 L334 4 L334 16 Z M342 14 L350 4 L350 16 Z M358 14 L366 4 L366 16 Z M374 14 L382 4 L382 16 Z M390 14 L398 4 L398 16 Z M406 14 L414 4 L414 16 Z M422 14 L430 4 L430 16 Z M438 14 L446 4 L446 16 Z M454 14 L462 4 L462 16 Z M470 14 L478 4 L478 16 Z M486 14 L494 4 L494 16 Z M502 14 L510 4 L510 16 Z M518 14 L526 4 L526 16 Z M534 14 L542 4 L542 16 Z M550 14 L558 4 L558 16 Z M566 14 L574 4 L574 16 Z M582 14 L590 4 L590 16 Z M598 14 L606 4 L606 16 Z" fill="#fff" fill-opacity=".09"/>
+  </g>
+  <line x1="22" y1="66" x2="618" y2="66" stroke="#fff" stroke-opacity=".2" stroke-width="1.2"/>
+  <line x1="22" y1="16" x2="618" y2="16" stroke="#000" stroke-opacity=".35" stroke-width="1"/>
+  <path d="M22 934 L618 934 L618 986 L618 986 L610 996 L602 986 L594 996 L586 986 L578 996 L570 986 L562 996 L554 986 L546 996 L538 986 L530 996 L522 986 L514 996 L506 986 L498 996 L490 986 L482 996 L474 986 L466 996 L458 986 L450 996 L442 986 L434 996 L426 986 L418 996 L410 986 L402 996 L394 986 L386 996 L378 986 L370 996 L362 986 L354 996 L346 986 L338 996 L330 986 L322 996 L314 986 L306 996 L298 986 L290 996 L282 986 L274 996 L266 986 L258 996 L250 986 L242 996 L234 986 L226 996 L218 986 L210 996 L202 986 L194 996 L186 986 L178 996 L170 986 L162 996 L154 986 L146 996 L138 986 L130 996 L122 986 L114 996 L106 986 L98 996 L90 986 L82 996 L74 986 L66 996 L58 986 L50 996 L42 986 L34 996 L26 986 L22 986 Z" fill="url(#sealFace)"/>
+  <g clip-path="url(#sealBottomClip)">
+    <rect x="0" y="920" width="640" height="80" fill="url(#ridges)"/>
+    <rect x="0" y="920" width="640" height="80" fill="url(#sealShadeBottom)"/>
+    <path d="M22 986 L30 996 L30 984 Z M38 986 L46 996 L46 984 Z M54 986 L62 996 L62 984 Z M70 986 L78 996 L78 984 Z M86 986 L94 996 L94 984 Z M102 986 L110 996 L110 984 Z M118 986 L126 996 L126 984 Z M134 986 L142 996 L142 984 Z M150 986 L158 996 L158 984 Z M166 986 L174 996 L174 984 Z M182 986 L190 996 L190 984 Z M198 986 L206 996 L206 984 Z M214 986 L222 996 L222 984 Z M230 986 L238 996 L238 984 Z M246 986 L254 996 L254 984 Z M262 986 L270 996 L270 984 Z M278 986 L286 996 L286 984 Z M294 986 L302 996 L302 984 Z M310 986 L318 996 L318 984 Z M326 986 L334 996 L334 984 Z M342 986 L350 996 L350 984 Z M358 986 L366 996 L366 984 Z M374 986 L382 996 L382 984 Z M390 986 L398 996 L398 984 Z M406 986 L414 996 L414 984 Z M422 986 L430 996 L430 984 Z M438 986 L446 996 L446 984 Z M454 986 L462 996 L462 984 Z M470 986 L478 996 L478 984 Z M486 986 L494 996 L494 984 Z M502 986 L510 996 L510 984 Z M518 986 L526 996 L526 984 Z M534 986 L542 996 L542 984 Z M550 986 L558 996 L558 984 Z M566 986 L574 996 L574 984 Z M582 986 L590 996 L590 984 Z M598 986 L606 996 L606 984 Z" fill="#fff" fill-opacity=".06"/>
+  </g>
+  <line x1="22" y1="934" x2="618" y2="934" stroke="#fff" stroke-opacity=".12" stroke-width="1.2"/>
+  <line x1="22" y1="984" x2="618" y2="984" stroke="#000" stroke-opacity=".35" stroke-width="1"/>
+
+  <!-- Tear guide at 9 %. -->
+  <line x1="44" y1="90" x2="596" y2="90" stroke="#fff" stroke-opacity=".1" stroke-width="1.2" stroke-dasharray="4 7"/>
+
+  <!-- Seal: gold ring with compass ticks, globe of puzzle pieces, W monogram. -->
+  <g transform="translate(320 450)">
+    <circle r="150" fill="#040405" fill-opacity=".55"/>
+    <circle r="150" fill="none" stroke="url(#gold)" stroke-width="2.5"/>
+    <circle r="140" fill="none" stroke="#e9c15a" stroke-opacity=".4" stroke-width="1" stroke-dasharray="1.5 5.5"/>
+    <g stroke="#e9c15a" stroke-width="2.5" stroke-linecap="round">
+      <line x1="0" y1="-164" x2="0" y2="-156"/><line x1="0" y1="164" x2="0" y2="156"/>
+      <line x1="-164" y1="0" x2="-156" y2="0"/><line x1="164" y1="0" x2="156" y2="0"/>
+    </g>
+    <path d="M0 -176 L5 -164 L0 -158 L-5 -164 Z" fill="url(#gold)"/>
+    <circle r="120" fill="none" stroke="url(#green)" stroke-width="2"/>
+  </g>
+  <circle cx="320" cy="450" r="106" fill="url(#globe)"/>
+  <g clip-path="url(#globeClip)" fill="none" stroke="#34d399" stroke-opacity=".38" stroke-width="1.6">
+    <ellipse cx="320" cy="450" rx="70" ry="106"/>
+    <ellipse cx="320" cy="450" rx="30" ry="106"/>
+    <path d="M214 414 Q320 394 426 414"/>
+    <path d="M214 486 Q320 506 426 486"/>
+    <line x1="214" y1="450" x2="426" y2="450"/>
+  </g>
+  <circle cx="320" cy="450" r="106" fill="none" stroke="#fff" stroke-opacity=".08" stroke-width="1"/>
+  <path d="M252 380 A96 96 0 0 1 344 358" stroke="#fff" stroke-opacity=".22" stroke-width="3" fill="none" stroke-linecap="round" filter="url(#soft)"/>
+  <g transform="translate(396 372) rotate(16)">
+    <path d="M-19 -19 H-5 A7 7 0 1 1 5 -19 H19 V-5 A7 7 0 1 0 19 5 V19 H-19 Z" fill="url(#green)"/>
+    <path d="M-19 -19 H-5 A7 7 0 1 1 5 -19 H19 V-5 A7 7 0 1 0 19 5 V19 H-19 Z" fill="none" stroke="#ecfdf5" stroke-opacity=".7" stroke-width="1.2"/>
+  </g>
+  <g fill="none" stroke-linejoin="miter">
+    <polyline points="266,414 293,498 320,438 347,498 374,414" stroke="#000" stroke-opacity=".55" stroke-width="22" transform="translate(0 4)"/>
+    <polyline points="266,414 293,498 320,438 347,498 374,414" stroke="url(#word)" stroke-width="16"/>
+    <path d="M252 414 H281 M359 414 H388" stroke="#f5f5f7" stroke-width="5"/>
+  </g>
+
+  <!-- Wordmark. -->
+  <g font-family="'SF Pro Display', 'Helvetica Neue', 'Segoe UI', Helvetica, Arial, sans-serif" text-anchor="middle">
+    <text x="320" y="182" font-size="14" font-weight="700" letter-spacing="7" fill="#8b8b95">ENCYCLOPÉDIE · SÉRIE I</text>
+    <text x="320" y="692" font-size="54" font-weight="800" letter-spacing="4" fill="url(#word)">WIKI MASTERS</text>
+    <g stroke="#e9c15a" stroke-opacity=".8" stroke-width="1.5">
+      <line x1="196" y1="726" x2="286" y2="726"/>
+      <line x1="354" y1="726" x2="444" y2="726"/>
+    </g>
+    <path d="M320 720 L326 726 L320 732 L314 726 Z" fill="url(#gold)"/>
+    <text x="320" y="768" font-size="14" font-weight="600" letter-spacing="6" fill="#8b8b95">COLLECTIONNEZ LE SAVOIR</text>
+  </g>
+  <!-- Light sweep across the foil, every few seconds. One band, cut once to the union of the
+       body and both heat-sealed ends: they overlap between the seals and the body, and
+       three separate copies doubled the light there. -->
+  <!--sweep-->
+  <g clip-path="url(#sweepClip)">
+    <rect x="-260" y="-100" width="220" height="1200" fill="url(#sweep)" transform="skewX(-14)">
+      <animateTransform attributeName="transform" type="translate" additive="sum" values="0 0;0 0;1160 0;1160 0" keyTimes="0;.45;.8;1" dur="6s" repeatCount="indefinite"/>
+    </rect>
+  </g>
+  <!--/sweep-->
+  </g>
+  <!--fold-->
+  <g>
+    <linearGradient id="flapLight" gradientUnits="userSpaceOnUse" x1="592.0" y1="31.0" x2="577.7" y2="65.6">
+      <stop offset="0" stop-color="#5a5a64"/>
+      <stop offset=".35" stop-color="#34343b"/>
+      <stop offset="1" stop-color="#1b1b20"/>
+    </linearGradient>
+    <g mask="url(#foldCut)" clip-path="url(#foldClip)">
+      <path d="M566.0 14.0 L560.0 25.3 L572.4 28.7 L566.5 40.0 L578.8 43.3 L572.9 54.7 L585.2 58.0 L586.9 61.6 L618.0 48.0 Z" transform="translate(-2.5 4)" fill="#000" fill-opacity=".7" filter="url(#softer)"/>
+      <path d="M566.0 14.0 L560.0 25.3 L572.4 28.7 L566.5 40.0 L578.8 43.3 L572.9 54.7 L585.2 58.0 L586.9 61.6 L618.0 48.0 Z" transform="translate(-1.25 2)" fill="#000" fill-opacity=".5" filter="url(#soft)"/>
+    </g>
+    <path d="M566.0 14.0 L560.0 25.3 L572.4 28.7 L566.5 40.0 L578.8 43.3 L572.9 54.7 L585.2 58.0 L586.9 61.6 L618.0 48.0 Z" fill="url(#flapLight)"/>
+    <path d="M566.0 14.0 L560.0 25.3 L572.4 28.7 L566.5 40.0 L578.8 43.3 L572.9 54.7 L585.2 58.0 L586.9 61.6 L618.0 48.0 Z" fill="url(#ridges)" fill-opacity=".8"/>
+    <path d="M566.0 14.0 L560.0 25.3 L572.4 28.7 L566.5 40.0 L578.8 43.3 L572.9 54.7 L585.2 58.0 L586.9 61.6 L618.0 48.0 Z" fill="none" stroke="#000" stroke-opacity=".45" stroke-width="1"/>
+    <path d="M566.0 14.0 L618.0 48.0" stroke="#fff" stroke-opacity=".55" stroke-width="1.4" stroke-linecap="round"/>
+  </g>
+  <!--/fold-->
+</svg>

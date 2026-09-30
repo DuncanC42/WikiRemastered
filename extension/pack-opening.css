@@ -1,0 +1,1292 @@
+/* Immersive pack opening. Isolated in its own Shadow DOM and top-layer dialog.
+   Graphite room, one soft top light, real depth (a pillow-shaped pack, cards with
+   an edge, a pile with thickness) and no decoration: no glow, particles, rays or
+   blur. Rarity shows in the card frame, the chips and the pacing.
+   Card faces mirror the native Wiki Masters card: rarity frame, art on the top
+   45 %, rarity chip, title, subtitle and ATK / DEF. */
+
+:host { all: initial; }
+
+* { box-sizing: border-box; }
+
+dialog {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  color: #f5f5f7;
+  background: transparent;
+  font: 500 14px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  outline: none;
+}
+dialog::backdrop { background: transparent; }
+
+.root {
+  --card-w: min(280px, 60vw, 36dvh);
+  --pack-w: min(290px, 58vw, 40dvh);
+  --heading: var(--font-heading, "Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif);
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --gw: calc(var(--pack-w) * 1.02);
+  --gy: calc(var(--pack-w) * .87);
+  position: absolute;
+  inset: 0;
+  isolation: isolate;
+}
+.root[data-phase="deck"], .root[data-phase="summary"] { --gw: calc(var(--card-w) * 1.16); --gy: calc(var(--card-w) * .74); }
+.card { transition: --wme-charge 420ms ease, --wme-thick 320ms ease, --dark 500ms ease; }
+
+/* ─── Room ────────────────────────────────────────────────────────────────── */
+
+/* One soft light from above on the app's graphite. No colour, no bloom. */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(80% 60% at 50% 30%, #1f1f24 0%, #17171a 46%, #111113 100%);
+  opacity: 0;
+}
+.backdrop::after {
+  /* Fine grain keeps the large gradient from banding. */
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: .05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+.vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(120% 100% at 50% 42%, transparent 52%, rgb(0 0 0 / .5) 100%);
+  opacity: 0;
+}
+/* The room darkens for the big pulls. It never takes a colour. */
+.dim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: #050506;
+  opacity: var(--dim, 0);
+  transition: opacity 700ms var(--ease);
+}
+/* Letterbox for the legendary cinematic. */
+.bars { position: absolute; inset: 0; pointer-events: none; }
+.bars i {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 12dvh;
+  background: #000;
+  transition: transform 800ms var(--ease);
+}
+.bars i:first-child { top: 0; transform: translateY(-101%); }
+.bars i:last-child { bottom: 0; transform: translateY(101%); }
+.root[data-cinematic] .bars i { transform: none; }
+
+/* ─── Stage ───────────────────────────────────────────────────────────────── */
+
+.stage {
+  position: absolute;
+  inset: 0;
+  perspective: 1400px;
+  perspective-origin: 50% 40%;
+  transform-style: preserve-3d;
+}
+.camera {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+.center {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+}
+/* Contact shadow on an implied floor: what the pack and the pile hover over. */
+.ground {
+  position: absolute;
+  left: calc(var(--gw) / -2);
+  top: var(--gy);
+  width: var(--gw);
+  height: calc(var(--gw) * .13);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(0 0 0 / .55), rgb(0 0 0 / .22) 58%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 600ms ease, left 500ms var(--ease), top 500ms var(--ease), width 500ms var(--ease);
+  animation: ground 5.2s ease-in-out infinite;
+}
+.root:is([data-phase="ready"], [data-phase="burst"], [data-phase="deck"]) .ground { opacity: 1; }
+
+/* ─── Pack ────────────────────────────────────────────────────────────────── */
+
+.pack-wrap {
+  position: absolute;
+  left: calc(var(--pack-w) / -2);
+  top: calc(var(--pack-w) * -.78);
+  width: var(--pack-w);
+  transform-style: preserve-3d;
+  z-index: 3;
+}
+.pack-float {
+  transform-style: preserve-3d;
+  animation: float 5.2s ease-in-out infinite;
+}
+.tilt {
+  transform-style: preserve-3d;
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  will-change: transform;
+}
+.pack {
+  --depth: calc(var(--pack-w) * .12);
+  --art-size: 100% 100%;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 640 / 1000;
+  transform-style: preserve-3d;
+  cursor: grab;
+}
+.root[data-phase="ready"] .stage { cursor: grab; }
+.root[data-tearing] .stage { cursor: grabbing; }
+.root[data-pack-style="classic"] .pack { aspect-ratio: 1602 / 2504; --art-size: 159.2% 131.8%; }
+
+.pack-part, .band, .pack-base {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: var(--pack-src) center / var(--art-size) no-repeat;
+}
+
+/* The sealed top of the pack. At rest it is plain art (so the light sweep runs over it), cut
+   at the tear line. Once the tear starts a canvas takes over and draws the torn foil as one
+   ribbon, bending off that line; after the tear it is flung off and fades. The canvas is a
+   leaf: its own fade does not flatten the pack's 3D. */
+.pack-cap { transform: translateZ(.6px); }
+.pack-strip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  transform: translateZ(.6px);
+  visibility: hidden;
+}
+.pack-strip[data-on] { visibility: visible; }
+.pack-strip[data-away] { opacity: 0; transition: opacity 260ms ease 200ms; }
+
+/* The inside of the pack, seen through the torn top: silver foil in shade, darker toward
+   the tear, and lit from below by the colour of the cards when there is light. It sits just
+   behind the seal and the cards, so it only shows once the seal has lifted. */
+.pack-mouth {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transform: translateZ(-3.2px);
+  /* It is the inside: from behind (the pack spins in), the seal itself shows, not this. */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  /* Cut to the art's outline, so the back panel has the same crimped top. */
+  -webkit-mask: var(--pack-src) center / var(--art-size) no-repeat;
+  mask: var(--pack-src) center / var(--art-size) no-repeat;
+  background:
+    linear-gradient(0deg, rgb(var(--lc, 0 0 0) / calc(var(--la, 0) * .5)), transparent 6%),
+    linear-gradient(90deg, rgb(0 0 0 / .5), transparent 14%, transparent 86%, rgb(0 0 0 / .5)),
+    linear-gradient(180deg, #5d616c 0%, #3a3d45 4.5%, #1c1e23 8.5%, #0b0c0e 11%);
+}
+.pack[data-torn] .pack-mouth { opacity: 0; transition: opacity 120ms ease-out; }
+.root[data-pack-style="classic"] .pack-mouth {
+  background:
+    linear-gradient(0deg, rgb(var(--lc, 0 0 0) / calc(var(--la, 0) * .4)), transparent 5.5%),
+    linear-gradient(90deg, rgb(0 0 0 / .2), transparent 16%, transparent 84%, rgb(0 0 0 / .2)),
+    linear-gradient(180deg, #f2f3f6 0%, #d3d5dc 4.5%, #8b8e99 8.5%, #575a64 11%);
+}
+
+/* The torn edge of the body: a thin lit rim of foil with a hair of shade under it. It
+   shows only where the tear has passed; its colour runs along the edge with the cards. */
+.pack-rim {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  transform: translateZ(1.6px);
+  opacity: 0;
+  filter: brightness(calc(1 + var(--surge, 0) * 1.4));
+  -webkit-mask: linear-gradient(90deg, #000 calc(var(--front, 0) * 100%), transparent calc(var(--front, 0) * 100% + 1.2%));
+  mask: linear-gradient(90deg, #000 calc(var(--front, 0) * 100%), transparent calc(var(--front, 0) * 100% + 1.2%));
+}
+.pack[data-tear-dir="rtl"] .pack-rim {
+  -webkit-mask-image: linear-gradient(270deg, #000 calc(var(--front, 0) * 100%), transparent calc(var(--front, 0) * 100% + 1.2%));
+  mask-image: linear-gradient(270deg, #000 calc(var(--front, 0) * 100%), transparent calc(var(--front, 0) * 100% + 1.2%));
+}
+.pack[data-tear-dir] .pack-rim { opacity: 1; }
+.pack-rim path { fill: none; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+.pack-rim .shade { stroke: rgb(0 0 0 / .55); stroke-width: 2.4px; }
+.pack-rim .edge { stroke-width: .9px; }
+
+/* The light show (see pack-light.js): two canvases much bigger than the pack, in the scene. The
+   first sits behind the front of the pack, in front of its inside and behind the cards, so
+   what is drawn on it really comes out of the tear; the second is in front of everything, so a
+   piece can pass in front of the cards. Their depth, and the scale that cancels the perspective
+   at that depth so that the two line up exactly, are set by the script (a piece that changes
+   canvas must not move). */
+.pack-light {
+  position: absolute;
+  pointer-events: none;
+}
+/* The curtain and the glow live in the pack: behind its front, in front of its inside. */
+.pack-leak { transform: translateZ(-2.6px); }
+
+/* The light the torn edge throws on the front of the pack: a band just under the tear, in
+   the spectrum of the edge, fading downward. It flares when the foil lets go. */
+.pack-spill {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transform: translateZ(1.2px);
+  opacity: calc(.3 + var(--surge, 0) * .5);
+  -webkit-mask:
+    linear-gradient(180deg, transparent 0, #000 9%, transparent 14.5%),
+    linear-gradient(90deg, #000 calc(var(--front, 0) * 100%), transparent calc(var(--front, 0) * 100% + 3%));
+  -webkit-mask-composite: source-in;
+  mask:
+    linear-gradient(180deg, transparent 0, #000 9%, transparent 14.5%),
+    linear-gradient(90deg, #000 calc(var(--front, 0) * 100%), transparent calc(var(--front, 0) * 100% + 3%));
+  mask-composite: intersect;
+}
+.pack[data-tear-dir="rtl"] .pack-spill {
+  -webkit-mask-image:
+    linear-gradient(180deg, transparent 0, #000 9%, transparent 14.5%),
+    linear-gradient(270deg, #000 calc(var(--front, 0) * 100%), transparent calc(var(--front, 0) * 100% + 3%));
+  mask-image:
+    linear-gradient(180deg, transparent 0, #000 9%, transparent 14.5%),
+    linear-gradient(270deg, #000 calc(var(--front, 0) * 100%), transparent calc(var(--front, 0) * 100% + 3%));
+}
+.pack:not([data-tear-dir]) .pack-spill { visibility: hidden; }
+
+/* The volume: two faces made of thin bands that follow the swell of the pillow,
+   the flat sealed ends, and two walls that close the sides. */
+.pack-body, .pack-face { position: absolute; inset: 0; transform-style: preserve-3d; pointer-events: none; }
+.band {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  clip-path: inset(calc(var(--y0) * 1%) 0 calc((100 - var(--y1)) * 1%) 0);
+  transform-origin: 50% calc(var(--yc) * 1%);
+  transform: translateZ(calc(var(--z) * var(--wme-inflate, 1))) rotateX(calc(var(--a) * var(--wme-inflate, 1)));
+}
+.pack-base { clip-path: inset(91.75% 0 0 0); }
+/* Back of the pack: plain dark foil, cut to the same silhouette. */
+.pack-face[data-side="back"] .band {
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / .05), transparent 28%, transparent 72%, rgb(0 0 0 / .22)),
+    linear-gradient(90deg, #060607, #18181d 7%, #26262c 30%, #141418 48%, #0f0f12 70%, #1c1c22 90%, #060607);
+  -webkit-mask: var(--pack-src) center / var(--art-size) no-repeat;
+  mask: var(--pack-src) center / var(--art-size) no-repeat;
+  transform: translateZ(calc(var(--z) * var(--wme-inflate, 1) * -1)) rotateY(180deg) rotateX(calc(var(--a) * var(--wme-inflate, 1)));
+}
+.pack-wall {
+  position: absolute;
+  /* A slice of the wall (see buildPackVolume): from the side of the art at its top (--x, --y) to
+     the side at its bottom, --len pack widths long, leaning by --lean with the shoulder. Its shading
+     is laid out over the whole height of the pack, so the slices join without a seam. */
+  top: var(--y, 0%);
+  height: calc(var(--pack-w) * var(--len, 1.5625));
+  width: calc(var(--depth) * var(--wme-inflate, 1));
+  transform-origin: 50% 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / .07), transparent 18%, transparent 82%, rgb(0 0 0 / .3)),
+    linear-gradient(90deg, #111114, #3b3f47 50%, #111114);
+  background-size: 100% calc(var(--pack-w) * 1.5625);
+  background-position: 0 calc(var(--pack-w) * -1.5625 * var(--yf, 0));
+}
+.pack-wall.left { left: calc(var(--x, 2.5%) - var(--depth) * var(--wme-inflate, 1) / 2); transform: rotateZ(var(--lean, 0deg)) rotateY(90deg); }
+.pack-wall.right { left: calc(100% - var(--x, 2.5%) - var(--depth) * var(--wme-inflate, 1) / 2); transform: rotateZ(calc(var(--lean, 0deg) * -1)) rotateY(-90deg); }
+/* The puzzle pack is printed on one flat marigold: its back and sides are that paper too. */
+.root[data-pack-style="puzzle"] .pack-face[data-side="back"] .band {
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / .1), transparent 26%, transparent 74%, rgb(150 80 0 / .2)),
+    linear-gradient(90deg, #d8900f, #f7b82c 8%, #ffc53a 32%, #f6b62e 58%, #eeac25 84%, #d8900f);
+}
+.root[data-pack-style="puzzle"] .pack-wall {
+  background-image:
+    linear-gradient(180deg, rgb(255 255 255 / .12), transparent 18%, transparent 82%, rgb(150 80 0 / .28)),
+    linear-gradient(90deg, #c98210, #f4b12b 50%, #c98210);
+}
+.root[data-pack-style="classic"] .pack-face[data-side="back"],
+.root[data-pack-style="classic"] .pack-wall { display: none; }
+/* The original pack is flat, but its front still sits a hair in front of the cards inside it. */
+.root[data-pack-style="classic"] .band { --z: 2px !important; --a: 0deg !important; }
+
+/* The glare that follows the pointer. It is drawn on every part of the pack (the sealed top,
+   each band of the front, the base), each cut to the art's own outline, so it follows the
+   curve of the pack, covers it whole and never sticks out past its edges. It only shows
+   while the pointer is over the pack: at rest, the sweep in the art is the only shine. */
+.pack-cap::after, .pack-face[data-side="front"] .band::after, .pack-base::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: var(--glare, 0);
+  background: linear-gradient(115deg, transparent calc(var(--mx, 50%) - 26%), rgb(255 255 255 / .1) calc(var(--mx, 50%) - 4%), transparent calc(var(--mx, 50%) + 14%));
+  -webkit-mask: var(--pack-src) center / var(--art-size) no-repeat;
+  mask: var(--pack-src) center / var(--art-size) no-repeat;
+}
+.root:not([data-pack-ready]) :is(.pack-cap, .band, .pack-base)::after { visibility: hidden; }
+
+/* The dark pack's light sweep, every few seconds. It used to be animated inside the SVG art, which
+   had the browser draw the art again, blurs and all, for every layer of the pack at every frame.
+   The art is now a still bitmap, and the sweep a gradient slid across each part of the front (the
+   sealed top, each band, the base), cut to the art's outline: a moving layer, drawn once. Same
+   band, slant and timing as the art's own (a 220-unit band at x -260, 1160 units across, from
+   45 % to 80 % of 6 s). */
+.pack-sweep { display: none; }
+.root[data-pack-style="dark"] .pack-sweep {
+  display: block;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask: var(--pack-src) center / var(--art-size) no-repeat;
+  mask: var(--pack-src) center / var(--art-size) no-repeat;
+}
+.root[data-pack-style="dark"] .pack-sweep::before {
+  content: "";
+  position: absolute;
+  top: -12%;
+  bottom: -12%;
+  left: -60%;
+  width: 34.4%;
+  background: linear-gradient(90deg, rgb(255 255 255 / 0), rgb(255 255 255 / .16) 45%, rgb(255 255 255 / .05) 55%, rgb(255 255 255 / 0));
+  transform: skewX(-14deg);
+  animation: pack-sweep 6s linear infinite;
+}
+.root:not([data-pack-ready]) .pack-sweep { visibility: hidden; }
+@keyframes pack-sweep {
+  0%, 45% { translate: 0 0; }
+  80%, 100% { translate: calc(var(--pack-w) * 1.8125) 0; }
+}
+
+.pack-guide {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: var(--tear-y, 9%);
+  height: 0;
+  border-top: 1px dashed rgb(255 255 255 / .5);
+  opacity: 0;
+  transition: opacity 300ms;
+  pointer-events: none;
+  transform: translateZ(2px);
+}
+/* Where to cut: a pair of scissors snips its way along the dashed line, which turns into a clean
+   cut behind it, then fades and comes round again. It floats a little above the pack, casting a
+   soft shadow on it, and a tiny spark pops at its tip each time it shuts. */
+.pack-guide::after {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  height: 2px;
+  border-radius: 1px;
+  background: rgb(255 255 255 / .85);
+  animation: guide-cut 2.8s cubic-bezier(.45, .05, .35, 1) infinite;
+}
+.guide-scissors {
+  position: absolute;
+  top: var(--tear-y, 9%);
+  left: 6%;
+  width: 23%;
+  aspect-ratio: 2;
+  /* The blades cross on the line, just behind their tips. */
+  translate: -86% -50%;
+  /* Above the pillow, which swells toward us just below the tear line. */
+  transform: translateZ(calc(var(--pack-w) * .07));
+  filter: drop-shadow(2px 8px 4px rgb(20 10 40 / .32));
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 300ms;
+  animation: guide-travel 2.8s cubic-bezier(.45, .05, .35, 1) infinite;
+}
+.scissors-body { position: absolute; inset: 0; animation: guide-fade 2.8s linear infinite; }
+/* Coral on the yellow puzzle pack, the site's green on the others (the cursor follows, in JS). */
+.root { --sc-handle: #34c98e; --sc-deep: #1d8a5c; }
+.root[data-pack-style="puzzle"] { --sc-handle: #ff5a4c; --sc-deep: #b3322b; }
+.guide-scissors svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.guide-scissors .half { transform-box: view-box; transform-origin: 64px 30px; animation: snip-a .34s ease-in-out infinite alternate; }
+.guide-scissors .half-b { animation-name: snip-b; }
+.snip-spark {
+  position: absolute;
+  left: 97%;
+  top: 50%;
+  width: 22%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: #fff4c2;
+  clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+  animation: spark .68s ease-out infinite;
+}
+.root[data-phase="ready"] :is(.pack-guide, .guide-scissors) { opacity: 1; }
+.root[data-tearing] :is(.pack-guide, .guide-scissors) { opacity: 0; }
+/* Over the pack the cursor is the scissors; while tearing they snip open and shut with the cut. */
+.root[data-phase="ready"] :is(.stage, .pack) { cursor: var(--scissors-open), grab; }
+/* Only while the pack is there to cut: the tearing mark stays on until the next pack. */
+.root[data-phase="ready"][data-tearing] :is(.stage, .pack) { cursor: var(--scissors-shut), grabbing; }
+.root[data-phase="ready"][data-tearing][data-snip] :is(.stage, .pack) { cursor: var(--scissors-open), grabbing; }
+.root:not([data-phase="ready"]) .pack { cursor: default; }
+
+/* ─── Cards ───────────────────────────────────────────────────────────────── */
+
+/* The pile. Each card carries its own thickness (--wme-thick), so the pile is as thick as
+   the cards left in it, and it turns with the pointer to show its edge. */
+.deck {
+  position: absolute;
+  left: calc(var(--card-w) / -2);
+  top: calc(var(--card-w) * -.7);
+  width: var(--card-w);
+  height: calc(var(--card-w) * 1.4);
+  transform-style: preserve-3d;
+  transform: rotateX(calc(var(--rx, 0deg) * .6)) rotateY(calc(var(--ry, 0deg) * .6));
+  will-change: transform;
+  z-index: 2;
+}
+.deck.settle { transition: transform 500ms var(--ease); }
+.deck > .card { left: 0; top: 0; }
+.card {
+  --wme-thick: 2.4px;
+  position: absolute;
+  left: calc(var(--w, var(--card-w)) / -2);
+  top: calc(var(--w, var(--card-w)) * -.7);
+  width: var(--w, var(--card-w));
+  aspect-ratio: 5 / 7;
+  transform-style: preserve-3d;
+  container-type: inline-size;
+}
+.card.in-deck { --wme-thick: 4px; }
+/* Inside the pack the cards are thin: they slide between its two skins. */
+.card.in-pack { --wme-thick: .6px; }
+.card .tilt { position: absolute; inset: 0; }
+.flip {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateY(180deg);
+}
+.card[data-face="front"] .flip { transform: rotateY(0deg); }
+.face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 6.4cqw;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(calc(var(--wme-thick) / 2));
+}
+/* The edge of the card: paper-coloured slices between the two faces. */
+.rim {
+  position: absolute;
+  inset: 0;
+  border-radius: 6.4cqw;
+  background: #dedee4;
+  transform: translateZ(calc((var(--i) / 4 - .5) * var(--wme-thick)));
+  pointer-events: none;
+}
+.rim:nth-child(even) { background: #bcbcc7; }
+.rim:nth-child(1) { background: #8d8d99; }
+
+/* Card back: graphite, embossed monogram. Its rim takes the rarity colour as the
+   card charges, and nothing else: no glow. */
+.back {
+  --lit: calc(var(--wme-charge, 0) * 100%);
+  transform: rotateY(180deg) translateZ(calc(var(--wme-thick) / 2));
+  background:
+    repeating-linear-gradient(45deg, rgb(255 255 255 / .035) 0 2px, transparent 2px 9px),
+    repeating-linear-gradient(-45deg, rgb(255 255 255 / .035) 0 2px, transparent 2px 9px),
+    linear-gradient(160deg, #2a2a31, #141418 55%, #1d1d23);
+  box-shadow:
+    inset 0 0 0 1.6cqw #0c0c0f,
+    inset 0 0 0 calc(1.6cqw + 1px + var(--wme-charge, 0) * .8cqw) color-mix(in srgb, rgb(var(--c-rgb, 255 255 255)) var(--lit), rgb(255 255 255 / .16));
+}
+.back::before {
+  content: "";
+  position: absolute;
+  inset: 8%;
+  border-radius: 4cqw;
+  border: 1px solid color-mix(in srgb, rgb(var(--c-rgb, 255 255 255)) var(--lit), rgb(255 255 255 / .09));
+  background: conic-gradient(from 0deg, transparent, rgb(255 255 255 / .05), transparent 30%);
+}
+/* Out of the puzzle pack, the backs are its illustration (card-back-puzzle.svg, in indigo so
+   that the rarity colours still show on the rim as the card charges): the image carries its own
+   frame and emblem. */
+.root[data-pack-style="puzzle"] .back {
+  background: var(--puzzle-back, none) center / cover no-repeat, #4332c4;
+  box-shadow:
+    inset 0 0 0 1.6cqw #2c1f96,
+    inset 0 0 0 calc(1.6cqw + 1px + var(--wme-charge, 0) * .8cqw) color-mix(in srgb, rgb(var(--c-rgb, 255 255 255)) var(--lit), rgb(255 242 210 / .3));
+}
+.root[data-pack-style="puzzle"] .back::before,
+.root[data-pack-style="puzzle"] .back .emblem { display: none; }
+/* Cards deeper in the pile sit in shade. */
+.back::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / var(--dark, 0));
+  pointer-events: none;
+}
+.back .emblem {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 38%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 35% 30%, #3a3a43, #18181d 70%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .18), 0 0 0 1px color-mix(in srgb, rgb(var(--c-rgb, 255 255 255)) var(--lit), rgb(255 255 255 / .08)), 0 0 0 3cqw rgb(0 0 0 / .25);
+}
+.back .emblem img { width: 58%; height: 58%; object-fit: contain; filter: invert(1); opacity: .9; }
+.back .emblem b { font: 800 11cqw/1 var(--heading); letter-spacing: -.04em; color: #e4e4e7; }
+
+/* Card front, mirroring the native component. */
+.front {
+  background: #d4f5e3;
+  box-shadow: 0 3cqw 8cqw -3cqw rgb(0 0 0 / .55);
+}
+.frame {
+  position: absolute;
+  inset: 0;
+  background: var(--frame) center / cover no-repeat;
+  transform: scale(1.8);
+}
+.art {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 2;
+  height: 45%;
+  overflow: hidden;
+  background: rgb(0 0 0 / .2);
+}
+.art img { width: 100%; height: 100%; object-fit: cover; display: block; -webkit-user-drag: none; }
+.art::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 26%;
+  background: linear-gradient(0deg, rgb(0 0 0 / .5), transparent);
+}
+.art .placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font: 800 22cqw/1 var(--heading);
+  color: rgb(0 0 0 / .28);
+}
+.chip {
+  position: absolute;
+  left: 4cqw;
+  top: 4cqw;
+  z-index: 4;
+  padding: 1.3cqw 3.2cqw;
+  border-radius: 2.4cqw;
+  font: 800 5cqw/1 var(--heading);
+  color: #0d1117;
+  background: rgb(var(--c-rgb));
+}
+.shiny-chip {
+  position: absolute;
+  right: 4cqw;
+  top: 4cqw;
+  z-index: 4;
+  padding: 1.3cqw 3cqw;
+  border-radius: 2.4cqw;
+  font: 800 4.4cqw/1 var(--heading);
+  letter-spacing: .06em;
+  color: #2b2006;
+  background: linear-gradient(135deg, #fff0b3, #e9c15a 45%, #fff6d0 60%, #d7a93c);
+}
+.body {
+  position: absolute;
+  inset: 45% 0 0;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  padding: 5.5cqw;
+  color: #000;
+}
+.body h3 {
+  margin: 0;
+  font: 700 6.2cqw/1.15 var(--heading);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.body p {
+  margin: 1.6cqw 0 0;
+  font: 500 4.6cqw/1.3 var(--heading);
+  color: rgb(23 23 23 / .85);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.stats {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  padding-top: 2.6cqw;
+  border-top: 1px solid rgb(0 0 0 / .2);
+  font: 700 4.8cqw/1 var(--heading);
+  color: rgb(0 0 0 / .9);
+}
+.stats span { display: inline-flex; align-items: center; gap: 1.4cqw; }
+.stats svg { width: 1em; height: 1em; }
+.stats .atk svg { color: #9f0712; }
+.stats .def svg { color: #193cb8; }
+
+/* Foil and glare, driven by --mx / --my from the pointer. Kept low: it should read
+   as printed foil catching a light, not as an effect. */
+.holo, .glare, .sheen {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.holo {
+  opacity: 0;
+  mix-blend-mode: color-dodge;
+  background:
+    repeating-linear-gradient(calc(var(--ry-num, 0) * 2deg + 110deg),
+      #ff7773 0%, #ffed5f 7%, #a8ff5f 14%, #83fff7 21%, #7894ff 28%, #d875ff 35%, #ff7773 42%),
+    radial-gradient(farthest-corner at var(--mx, 50%) var(--my, 50%), rgb(255 255 255 / .4), transparent 60%);
+  background-size: 300% 300%, 100% 100%;
+  background-position: calc(var(--mx, 50%) * 1.4) calc(var(--my, 50%) * 1.4), 0 0;
+  filter: brightness(.7) contrast(1.4) saturate(1.1);
+  transition: opacity 600ms ease;
+}
+.glare {
+  opacity: 0;
+  mix-blend-mode: overlay;
+  background: radial-gradient(farthest-corner circle at var(--mx, 50%) var(--my, 50%), rgb(255 255 255 / .6) 0%, rgb(255 255 255 / .16) 26%, transparent 60%);
+  transition: opacity 400ms ease;
+}
+.card[data-tier="1"][data-face="front"] .holo { opacity: .1; }
+.card[data-tier="2"][data-face="front"] .holo { opacity: .17; }
+.card[data-tier="3"][data-face="front"] .holo { opacity: .24; }
+.card[data-tier="4"][data-face="front"] .holo { opacity: .32; }
+.card[data-shiny="true"][data-face="front"] .holo { opacity: .5; filter: brightness(.85) contrast(1.5) saturate(1.3); }
+.card[data-face="front"].live .glare { opacity: .55; }
+/* A single pass of light across the face when a rare card lands. */
+.sheen {
+  background: linear-gradient(105deg, transparent 42%, rgb(255 255 255 / .3) 50%, transparent 58%) 220% 0 / 260% 100% no-repeat;
+  opacity: 0;
+}
+.card.pass .sheen { animation: pass 1.2s ease-out 1 both; }
+.card.pass.again .sheen { animation: pass 1.2s ease-out 1 both, pass 1.4s ease-out 2.4s 1 both; }
+.card[data-shiny="true"] .face.front { box-shadow: inset 0 0 0 1.2cqw rgb(233 193 90 / .9), 0 3cqw 8cqw -3cqw rgb(0 0 0 / .55); }
+
+.card[data-face="front"].live { cursor: pointer; }
+.card.in-deck { cursor: pointer; }
+
+/* Shake intensities for charge phases. */
+.shake-1 { animation: shake 300ms ease-in-out infinite; --amp: 1.6px; }
+.shake-2 { animation: shake 230ms ease-in-out infinite; --amp: 3px; }
+.shake-3 { animation: shake 170ms ease-in-out infinite; --amp: 4.6px; }
+
+/* ─── Caption ─────────────────────────────────────────────────────────────── */
+
+.caption {
+  position: absolute;
+  left: 50%;
+  top: calc(44% + var(--card-w) * .82 + 8px);
+  transform: translate(-50%, 6px);
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  width: min(92vw, 520px);
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 260ms ease, transform 360ms var(--ease);
+}
+.caption.on { opacity: 1; transform: translate(-50%, 0); }
+.tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+/* The same chip as on the card face: the rarity colour, flat, with dark text. */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 9px;
+  border-radius: 6px;
+  font: 800 12px/1 var(--heading);
+  color: #0d1117;
+  background: rgb(var(--c-rgb, 184 242 213));
+}
+.tag.shiny { color: #2b2006; background: linear-gradient(135deg, #fff0b3, #e9c15a 45%, #fff6d0 60%, #d7a93c); }
+.tag[hidden] { display: none; }
+/* The same blue star as the favorite button, once the copy is in favorites. */
+.tag.fav { gap: 5px; padding: 0 9px 0 7px; color: #6cb6ff; background: #232327; box-shadow: inset 0 0 0 1px rgb(108 182 255 / .45); }
+.tag.fav svg { width: 12px; height: 12px; fill: currentColor; }
+.caption .title { font: 700 20px/1.2 var(--heading); letter-spacing: -.01em; color: #f5f5f7; text-wrap: balance; }
+.caption .meta { font-size: 12px; color: #a1a1aa; font-variant-numeric: tabular-nums; }
+.caption[data-tier="3"] .title, .caption[data-tier="4"] .title { font-size: 24px; }
+.caption[data-tier="3"] .tag, .caption[data-tier="4"] .tag { height: 24px; padding: 0 11px; font-size: 13px; }
+
+/* ─── HUD ─────────────────────────────────────────────────────────────────── */
+
+.hud {
+  position: absolute;
+  inset: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left));
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+.root:not([data-phase="summon"]) .hud { opacity: 1; }
+.root[data-cinematic] .hud { opacity: 0; }
+.hud > * { pointer-events: auto; }
+.hud-left { display: flex; align-items: center; gap: 8px; }
+/* The site's own stock bar: ten segments. */
+.stock {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background: #17171a;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .05), 0 0 0 1px rgb(255 255 255 / .06);
+  font-variant-numeric: tabular-nums;
+  color: #a1a1aa;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.stock b { color: #f5f5f7; font-weight: 700; }
+.pips { display: inline-flex; gap: 3px; }
+.pips i { width: 5px; height: 14px; border-radius: 2px; background: rgb(255 255 255 / .1); }
+.pips i.on { background: #34d399; }
+.hud-actions { display: flex; gap: 8px; }
+
+button {
+  font: inherit;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+/* Buttons: the extension's graphite controls (raised fill, short relief, 8 px). */
+.btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  white-space: nowrap;
+  color: #f5f5f7;
+  background: linear-gradient(180deg, rgb(255 255 255 / .06), transparent 60%), #232327;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .07), 0 1px 2px rgb(0 0 0 / .35);
+  transition: background-color 120ms ease, transform 120ms ease, opacity 200ms ease;
+}
+.btn:hover { background-color: #2b2b30; }
+.btn:active { transform: translateY(1px); }
+.btn:focus-visible { outline: 2px solid #6ee7b7; outline-offset: 2px; }
+.btn svg { width: 16px; height: 16px; flex: none; }
+.btn.icon { width: 36px; padding: 0; }
+.btn.icon svg { width: 18px; height: 18px; }
+/* The primary action is the site's green CTA, with dark text. */
+.btn.primary {
+  min-height: 44px;
+  padding: 0 22px;
+  font-size: 15px;
+  color: #062b1e;
+  background: linear-gradient(180deg, rgb(245 245 247 / .22), transparent 62%), #34d399;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .3), inset 0 -1px 0 rgb(4 60 40 / .35), 0 1px 3px rgb(0 0 0 / .4);
+}
+.btn.primary:hover { background-color: #4ade9f; }
+/* Switching the pack's design: the extension's blue CTA (#0766c5, light top edge, darker lower edge). */
+.btn.design-switch {
+  background: linear-gradient(180deg, rgb(245 245 247 / .04), transparent 65%), #0766c5;
+  box-shadow: inset 0 1px 0 rgb(245 245 247 / .23), inset 0 -1px 0 rgb(5 20 40 / .28), 0 1px 3px rgb(0 0 0 / .4);
+}
+.btn.design-switch:hover { background-color: color-mix(in srgb, #0766c5 88%, white); }
+.btn.design-switch:focus-visible { outline-color: #6cb6ff; }
+.btn.large { min-height: 44px; padding: 0 20px; font-size: 15px; }
+.btn[disabled] { opacity: .45; cursor: default; transform: none; }
+.btn[hidden] { display: none; }
+.pack-open-button { position: absolute; left: 50%; bottom: max(28px, calc(env(safe-area-inset-bottom) + 20px)); translate: -50% 0; white-space: nowrap; }
+.root[data-phase='ready'] .hint { bottom: max(84px, calc(env(safe-area-inset-bottom) + 76px)); max-width: calc(100% - 32px); white-space: normal; text-align: center; }
+
+/* Plain text: an instruction is not a control. */
+.hint {
+  position: absolute;
+  left: 50%;
+  bottom: max(28px, calc(env(safe-area-inset-bottom) + 20px));
+  transform: translateX(-50%);
+  margin: 0;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 500;
+  color: #a1a1aa;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+.hint.on { opacity: 1; }
+.hint .keys { margin-left: 12px; opacity: .85; }
+@media (pointer: coarse) { .hint .keys { display: none; } }
+.hint kbd {
+  display: inline-block;
+  margin: 0 2px;
+  padding: 1px 6px;
+  border-radius: 5px;
+  font: 600 11px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: rgb(255 255 255 / .08);
+}
+
+/* One segment per card; each takes the colour of the rarity it revealed. */
+.counter {
+  position: absolute;
+  left: 50%;
+  top: max(20px, env(safe-area-inset-top));
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  padding-top: 15px;
+  opacity: 0;
+  transition: opacity 300ms;
+  pointer-events: none;
+}
+.counter.on { opacity: 1; }
+.counter i {
+  width: 22px;
+  height: 3px;
+  border-radius: 2px;
+  background: rgb(255 255 255 / .12);
+  transition: background-color 300ms;
+}
+.counter i.done { background: var(--dot, #fff); }
+.root[data-cinematic] .counter { opacity: 0; }
+
+/* ─── Tray of revealed cards ──────────────────────────────────────────────── */
+
+.tray {
+  position: absolute;
+  left: 50%;
+  bottom: max(66px, calc(env(safe-area-inset-bottom) + 60px));
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  pointer-events: none;
+  transition: opacity 400ms;
+}
+.tray .slot {
+  position: relative;
+  width: 44px;
+  aspect-ratio: 5 / 7;
+  border-radius: 5px;
+  background: rgb(255 255 255 / .04);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / .07);
+}
+.tray .slot .card { --w: 44px; --wme-thick: 1px; left: 0; top: 0; }
+.root[data-cinematic] .tray { opacity: 0; }
+.root[data-phase="summary"] .tray { opacity: 0; }
+
+/* ─── Summary ─────────────────────────────────────────────────────────────── */
+
+.summary {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  justify-items: center;
+  align-items: center;
+  padding: max(72px, calc(env(safe-area-inset-top) + 64px)) 16px max(24px, calc(env(safe-area-inset-bottom) + 16px));
+  pointer-events: none;
+  opacity: 0;
+}
+.root[data-phase="summary"] .summary { pointer-events: auto; opacity: 1; }
+.summary-head { display: grid; justify-items: center; gap: 12px; text-align: center; }
+.summary-head h2 {
+  margin: 0;
+  font: 700 clamp(24px, 3.6vw, 32px)/1.1 var(--heading);
+  letter-spacing: -.02em;
+}
+.summary-head p { margin: 0; color: #a1a1aa; font-size: 14px; }
+.tally { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+/* The card's own rarity chip, followed by the count. */
+.tally-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  padding: 0 10px 0 4px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: #d4d4d8;
+  background: #1c1c20;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .05);
+}
+.tally-chip b {
+  display: grid;
+  place-items: center;
+  min-width: 24px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 5px;
+  font: 800 11px/1 var(--heading);
+  color: #0d1117;
+  background: rgb(var(--c-rgb));
+}
+.tally-chip.shiny b { color: #2b2006; background: linear-gradient(135deg, #fff0b3, #e9c15a 45%, #fff6d0 60%, #d7a93c); }
+.fan {
+  --w: min(210px, 16vw, 32dvh);
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: calc(var(--w) * 1.5);
+  perspective: 1200px;
+}
+.fan .card {
+  left: calc(50% - var(--w) / 2 + var(--fx, 0px));
+  top: calc(50% - var(--w) * .7 + var(--fy, 0px));
+  transform: rotate(var(--fr, 0deg));
+  transition: transform 380ms var(--ease);
+  cursor: zoom-in;
+}
+.fan .card:hover, .fan .card:focus-visible {
+  transform: translateY(-8%) rotate(0deg) scale(1.06);
+  z-index: 10;
+  outline: none;
+}
+.fan .card:focus-visible .front { outline: 2px solid #6ee7b7; outline-offset: 3px; }
+.summary-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+
+.inspect {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: auto;
+  padding: max(24px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
+  background: rgb(10 10 12 / .97);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 240ms ease;
+  cursor: zoom-out;
+}
+.inspect.on { opacity: 1; pointer-events: auto; }
+/* The card, and beside it the column of what there is to know and do. */
+.sheet {
+  display: grid;
+  grid-template-columns: auto minmax(0, 400px);
+  align-items: center;
+  gap: clamp(24px, 5vw, 64px);
+  max-width: 100%;
+  cursor: default;
+}
+.inspect-stage { display: grid; place-items: center; perspective: 1400px; }
+.inspect .card { --w: min(320px, 38vw, 62dvh); position: relative; left: auto; top: auto; }
+.sheet-side { display: grid; gap: 18px; align-content: center; min-width: 0; }
+.sheet-info { display: grid; gap: 10px; }
+.sheet-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.sheet-rarity {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: rgb(var(--c-rgb, 245 245 247));
+  background: rgb(var(--c-rgb, 245 245 247) / .14);
+}
+.sheet-rarity.shiny { color: #ffe08a; background: rgb(255 214 102 / .14); }
+.sheet-title { margin: 0; font: 800 clamp(22px, 2.4vw, 30px)/1.15 var(--heading); letter-spacing: -.01em; overflow-wrap: anywhere; }
+.sheet-subtitle { margin: 0; color: #a1a1aa; font-size: 14px; line-height: 1.5; }
+.sheet-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 6px 0 0; }
+.sheet-stat { display: grid; gap: 2px; padding: 10px 12px; border-radius: 10px; background: #1c1c20; box-shadow: inset 0 1px 0 rgb(255 255 255 / .05); }
+.sheet-stat dt { color: #a1a1aa; font-size: 12px; }
+.sheet-stat dd { margin: 0; font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.inspect-bar { display: flex; flex-wrap: wrap; gap: 8px; }
+.inspect-bar .btn svg { width: 15px; height: 15px; }
+.inspect-wiki { text-decoration: none; }
+.inspect-fav[aria-pressed="true"] { color: #6cb6ff; box-shadow: inset 0 1px 0 rgb(255 255 255 / .08), 0 0 0 1px rgb(108 182 255 / .45); }
+.inspect-fav[aria-pressed="true"] svg { fill: currentColor; }
+.inspect-fav[aria-busy="true"] { cursor: progress; }
+/* The way to the site's own actions: the extension's blue CTA. */
+.inspect-sheet {
+  background: linear-gradient(180deg, rgb(245 245 247 / .04), transparent 65%), #0766c5;
+  box-shadow: inset 0 1px 0 rgb(245 245 247 / .23), inset 0 -1px 0 rgb(5 20 40 / .28), 0 1px 3px rgb(0 0 0 / .4);
+}
+.inspect-sheet:hover { background-color: color-mix(in srgb, #0766c5 88%, white); }
+.inspect-note { margin: 0; color: #a1a1aa; font-size: 13px; line-height: 1.5; }
+.inspect-note[hidden] { display: none; }
+.inspect-close { position: absolute; top: max(14px, env(safe-area-inset-top)); right: max(14px, env(safe-area-inset-right)); }
+/* The site's own panel, in the column, in place of the sheet's text: one sheet at a time, the
+   card still beside it. Everything else in the frame is hidden, so only the panel shows. */
+.sheet-site { display: none; gap: 10px; }
+.inspect.site .sheet-info, .inspect.site .inspect-bar, .inspect.site .inspect-note { display: none; }
+.inspect.site .sheet-site { display: grid; }
+.sheet-site-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.sheet-site-title { color: #a1a1aa; font-size: 13px; }
+.sheet-back { padding-left: 10px; }
+.sheet-wait {
+  display: grid;
+  place-items: center;
+  gap: 12px;
+  height: min(68dvh, 600px);
+  border-radius: 14px;
+  background: #17171a;
+  color: #a1a1aa;
+  font-size: 13px;
+}
+.sheet-wait::before { content: ""; width: 22px; height: 22px; border-radius: 50%; border: 2px solid rgb(255 255 255 / .15); border-top-color: #f5f5f7; animation: spin 700ms linear infinite; }
+.inspect.sheet-ready .sheet-wait { display: none; }
+.sheet-frame {
+  display: none;
+  width: 100%;
+  height: min(68dvh, 600px);
+  border: 0;
+  border-radius: 14px;
+  background: #17171a;
+  color-scheme: dark;
+}
+.inspect.sheet-ready .sheet-frame { display: block; }
+@media (max-width: 760px) {
+  .inspect { place-items: start center; }
+  .sheet { grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 20px; }
+  .inspect .card { --w: min(240px, 62vw, 40dvh); }
+  .sheet-side { width: min(420px, 100%); }
+}
+
+/* ─── Messages ────────────────────────────────────────────────────────────── */
+
+.message {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(420px, calc(100vw - 32px));
+  transform: translate(-50%, -50%);
+  display: grid;
+  gap: 14px;
+  padding: 22px;
+  border-radius: 18px;
+  background: #17171a;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .06), 0 0 0 1px rgb(255 255 255 / .08), 0 24px 60px rgb(0 0 0 / .5);
+  text-align: left;
+}
+.message[hidden] { display: none; }
+.message h2 { margin: 0; font: 700 18px/1.25 var(--heading); }
+.message p { margin: 0; color: #a1a1aa; }
+.message .row { display: flex; justify-content: flex-end; gap: 8px; }
+
+/* A little star pinned on the top edge of a copy that is in favorites: in the tray and the
+   summary, where neighbouring cards overlap the corners (the card on stage has its own star). */
+.star-badge {
+  --badge: clamp(16px, 12cqw, 30px);
+  position: absolute;
+  top: calc(var(--badge) / -2);
+  left: calc(50% - var(--badge) / 2);
+  z-index: 9;
+  display: none;
+  place-items: center;
+  width: var(--badge);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  color: #6cb6ff;
+  background: #232327;
+  box-shadow: 0 0 0 1px rgb(108 182 255 / .5), 0 2px 4px rgb(0 0 0 / .45);
+  pointer-events: none;
+}
+.star-badge svg { width: 62%; height: 62%; fill: currentColor; }
+.tray .card[data-starred="true"] .star-badge, .fan .card[data-starred="true"] .star-badge { display: grid; }
+
+/* Waiting for the server: a small ring, like the extension's own loaders. */
+.loading {
+  position: absolute;
+  left: 50%;
+  top: calc(44% + var(--pack-w) * 1.02);
+  width: 20px;
+  height: 20px;
+  margin-left: -10px;
+  border-radius: 50%;
+  border: 2px solid rgb(255 255 255 / .14);
+  border-top-color: #f5f5f7;
+  opacity: 0;
+  transition: opacity 300ms;
+  animation: spin 800ms linear infinite;
+}
+.loading.on { opacity: 1; }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ─── Keyframes ───────────────────────────────────────────────────────────── */
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes float {
+  0%, 100% { transform: translate3d(0, 0, 0) rotateZ(-.8deg); }
+  50% { transform: translate3d(0, -9px, 0) rotateZ(.8deg); }
+}
+@keyframes ground {
+  0%, 100% { scale: 1; }
+  50% { scale: .93; }
+}
+/* Along the line (6 % to 94 % of the pack), in step with the cut drawn behind (guide-cut). */
+@keyframes guide-travel {
+  0% { left: 6%; }
+  82%, 100% { left: 94%; }
+}
+@keyframes guide-fade {
+  0% { opacity: 0; }
+  10%, 72% { opacity: 1; }
+  82%, 100% { opacity: 0; }
+}
+@keyframes guide-cut {
+  0% { width: 0; opacity: 1; }
+  72% { opacity: 1; }
+  82% { width: 100%; opacity: 0; }
+  100% { width: 100%; opacity: 0; }
+}
+@keyframes snip-a { from { rotate: -17deg; } to { rotate: -1deg; } }
+@keyframes snip-b { from { rotate: 17deg; } to { rotate: 1deg; } }
+/* The spark pops as the blades shut (every other half-cycle of the snip). */
+@keyframes spark {
+  0%, 44% { scale: 0; opacity: 0; }
+  52% { scale: 1; opacity: 1; }
+  80%, 100% { scale: .4; opacity: 0; }
+}
+/* Tension without jolts: a soft tremble, on curves (each step eased), that gets quicker and
+   wider with the tier. It never snaps from one position to the next. */
+@keyframes shake {
+  0%, 100% { translate: 0 0; rotate: 0deg; }
+  25% { translate: calc(var(--amp) * .6) calc(var(--amp) * -.8); rotate: calc(var(--amp) * .05deg); }
+  50% { translate: calc(var(--amp) * -.7) calc(var(--amp) * .3); rotate: calc(var(--amp) * -.04deg); }
+  75% { translate: calc(var(--amp) * .3) calc(var(--amp) * .7); rotate: calc(var(--amp) * .03deg); }
+}
+@keyframes pass {
+  0% { opacity: 1; background-position: 220% 0; }
+  100% { opacity: 1; background-position: -120% 0; }
+}
+
+@media (max-width: 480px) {
+  .hud { gap: 8px; flex-wrap: wrap; }
+  .hud-actions { gap: 6px; flex-wrap: wrap; justify-content: flex-end; margin-left: auto; }
+  .hud .btn { padding: 0 10px; }
+  .hud .btn.icon { width: 36px; padding: 0; }
+  .stock { gap: 8px; padding: 0 10px; }
+  .pips { gap: 2px; }
+  .pips i { width: 4px; }
+}
+@media (max-width: 720px) {
+  /* The top bar fills the width: the progress segments move under it. */
+  .counter { top: calc(max(16px, env(safe-area-inset-top)) + 46px); padding-top: 0; }
+  .root { --card-w: min(260px, 64vw, 40dvh); }
+  .fan { --w: min(150px, 30vw); }
+  .tray .slot { width: 34px; }
+  .tray .slot .card { --w: 34px; }
+  .caption .title { font-size: 17px; }
+  .caption[data-tier="3"] .title, .caption[data-tier="4"] .title { font-size: 20px; }
+  .hud .btn.text-label span { display: none; }
+}
+@media (max-width: 720px) and (orientation: portrait) {
+  .fan { --w: min(128px, 27vw); }
+}
+
+@media (max-height: 720px) and (min-width: 721px) {
+  .root { --card-w: min(280px, 32dvh); }
+  .tray { left: auto; right: max(16px, env(safe-area-inset-right)); bottom: auto; top: 50%; transform: translateY(-50%); flex-direction: column; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pack-float, .ground, .loading { animation: none !important; }
+  .pack-sweep { display: none !important; }
+  .pack-guide::after { animation: none !important; width: 0; }
+  .guide-scissors, .scissors-body { animation: none !important; }
+  .guide-scissors { left: 16%; }
+  .guide-scissors .half, .snip-spark { animation: none !important; }
+  .snip-spark { opacity: 0; }
+  .card.pass .sheen { animation: none !important; }
+  .shake-1, .shake-2, .shake-3 { animation: none; }
+}
+
+.root[data-tearing] .design-switch { opacity: 0; pointer-events: none; }
+
+.btn.speed { min-width: 44px; font-variant-numeric: tabular-nums; font-weight: 700; }
+.btn.speed[data-on="true"], .btn.spoil[data-on="true"] { color: #6ee7b7; box-shadow: inset 0 1px 0 rgb(255 255 255 / .08), 0 0 0 1px rgb(52 211 153 / .45); }
+
+/* Favorite is a separate hit target; it never advances the reveal. Small and quiet: a
+   translucent plate with a star, blue once it is on. The hit area is larger than the plate. */
+.card-favorite {
+  position: absolute;
+  top: 3.4cqw;
+  right: 3.4cqw;
+  z-index: 8;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid rgb(245 245 247 / 14%);
+  border-radius: 8px;
+  background: rgb(20 20 23 / 62%);
+  color: rgb(245 245 247 / 86%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 7%);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.card-favorite svg { width: 15px; height: 15px; pointer-events: none; }
+.card-favorite[aria-pressed='true'] { color: #6cb6ff; border-color: rgb(108 182 255 / 50%); background: rgb(20 32 48 / 78%); }
+.card-favorite[aria-pressed='true'] svg { fill: currentColor; }
+.card-favorite:focus-visible { outline: 2px solid #6cb6ff; outline-offset: 2px; }
+.card-favorite::before { content: ''; position: absolute; inset: -9px; }
+.card-favorite[aria-busy='true'] { cursor: progress; }
+.card-favorite[aria-busy='true'] svg { opacity: .6; }
+/* The state shows at once; a thin ring turns around the button until the site has confirmed it. */
+.card-favorite[aria-busy='true']::after { content: ''; position: absolute; inset: -3px; border: 2px solid transparent; border-top-color: #6cb6ff; border-radius: 10px; }
+.front:has(.card-favorite) > .shiny-chip { top: calc(3.4cqw + 34px); }
+.favorite-notice { position: absolute; z-index: 50; left: 50%; bottom: 80px; transform: translateX(-50%); width: max-content; max-width: calc(100% - 32px); margin: 0; padding: 10px 14px; border-radius: 8px; background: #232327; color: #f5f5f7; font-size: 13px; }
+@media (hover: hover) { .card-favorite:hover { background-color: rgb(52 52 58 / 82%); color: #f5f5f7; } .card-favorite[aria-pressed='true']:hover { background-color: rgb(28 44 66 / 88%); } }
+@media (pointer: coarse) { .card-favorite { width: 36px; height: 36px; } .card-favorite svg { width: 18px; height: 18px; } .front:has(.card-favorite) > .shiny-chip { top: calc(3.4cqw + 42px); } }
+@media (prefers-reduced-motion: no-preference) {
+  .card-favorite { transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease; }
+  .card-favorite[aria-busy='true']::after { animation: favorite-loading 800ms linear infinite; }
+  @keyframes favorite-loading { to { transform: rotate(360deg); } }
+}

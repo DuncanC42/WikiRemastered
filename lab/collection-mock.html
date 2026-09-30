@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Labo · Collection (maquette)</title>
+<!-- A stand-in for the site's own /collection page, only to exercise the extension's
+     frame-driven flows in the lab: the search field, paging, the favorite button on each
+     row, and a card panel that opens when a card is pressed. The markup keeps the hooks the
+     real page exposes (data-wme-owned-id, data-wme-starred, the search placeholder, the
+     "Suivant →" button). It is not the real page and proves nothing about its DOM. -->
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; background: #111113; color: #f5f5f7; font: 14px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; }
+  aside { position: fixed; inset: 0 auto 0 0; width: 200px; padding: 20px; background: #17171a; }
+  main { margin-left: 200px; padding: 24px; }
+  input { width: 100%; max-width: 420px; padding: 10px 12px; border: 1px solid #333; border-radius: 8px; background: #1c1c20; color: inherit; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; margin: 20px 0; }
+  .relative { position: relative; }
+  .card { min-height: 190px; padding: 12px; border-radius: 12px; background: #d4f5e3; color: #000; cursor: pointer; }
+  .card h3 { margin: 0; font-size: 14px; }
+  .star { position: absolute; top: 8px; right: 8px; z-index: 2; width: 32px; height: 32px; border: 0; border-radius: 8px; background: #232327; color: #f5f5f7; cursor: pointer; }
+  [data-wme-starred="true"] .star { color: #6cb6ff; }
+  .fixed { position: fixed; } .inset-0 { inset: 0; }
+  .backdrop { position: absolute; inset: 0; background: rgb(0 0 0 / .6); }
+  .panel { position: relative; margin: 12vh auto 0; width: min(420px, 90vw); padding: 22px; border-radius: 16px; background: #1c1c20; box-shadow: 0 20px 60px rgb(0 0 0 / .6); }
+  .panel h2 { margin: 0 0 4px; }
+  .panel .actions { display: grid; gap: 8px; margin-top: 16px; }
+  .panel button { padding: 10px; border: 0; border-radius: 8px; background: #2b2b30; color: inherit; font: inherit; cursor: pointer; }
+  header.top { display: none; }
+</style>
+</head>
+<body>
+<aside><strong>Wiki Masters</strong><nav>Collection</nav></aside>
+<main>
+  <input type="text" placeholder="Rechercher par titre ou catégorie...">
+  <div class="grid" id="grid"></div>
+  <button id="next">Suivant →</button>
+</main>
+<script>
+  document.documentElement.setAttribute('data-wme-account', '00000000-0000-4000-8000-00000000a001');
+  const PAGE = 3;
+  let query = '';
+  let page = 0;
+  const load = () => { try { return JSON.parse(localStorage.getItem('wme-lab-collection')) || []; } catch { return []; } };
+  const save = list => { try { localStorage.setItem('wme-lab-collection', JSON.stringify(list)); } catch {} };
+  const grid = document.getElementById('grid');
+  const next = document.getElementById('next');
+
+  function render() {
+    const list = load().filter(card => `${card.title} ${card.category}`.toLowerCase().includes(query.toLowerCase()));
+    const shown = list.slice(page * PAGE, page * PAGE + PAGE);
+    next.disabled = (page + 1) * PAGE >= list.length;
+    grid.replaceChildren(...shown.map(card => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'relative isolate group';
+      wrapper.dataset.wmeOwnedId = card.id;
+      wrapper.dataset.wmeStarred = String(Boolean(card.starred));
+      wrapper.innerHTML = `<button class="star" aria-label="${card.starred ? 'Retirer des favoris' : 'Ajouter aux favoris'}">★</button><div class="card"><h3></h3><p>${card.rarity}</p></div>`;
+      wrapper.querySelector('h3').textContent = card.title;
+      wrapper.querySelector('.star').addEventListener('click', event => {
+        event.stopPropagation();
+        const all = load();
+        const target = all.find(item => item.id === card.id);
+        target.starred = !target.starred;
+        save(all);
+        setTimeout(render, 250); // The site confirms a little later.
+      });
+      wrapper.querySelector('.card').addEventListener('click', () => openPanel(card));
+      return wrapper;
+    }));
+  }
+
+  function openPanel(card) {
+    const overlay = document.createElement('div');
+    overlay.className = 'fixed inset-0';
+    overlay.setAttribute('role', 'dialog');
+    overlay.innerHTML = '<div class="backdrop"></div><div class="panel"><h2></h2><p></p><div class="actions"><button>Ajouter aux favoris</button><button>Mettre aux enchères</button><button>Défausser</button><button data-close>Fermer</button></div></div>';
+    overlay.querySelector('h2').textContent = card.title;
+    overlay.querySelector('p').textContent = `${card.rarity} · fiche de la carte`;
+    overlay.querySelector('.backdrop').addEventListener('click', () => overlay.remove());
+    overlay.querySelector('[data-close]').addEventListener('click', () => overlay.remove());
+    // As on the site (assumed): the sale opens its own dialog, a second window at the page level.
+    overlay.querySelectorAll('.actions button')[1].addEventListener('click', () => openSale(card, overlay));
+    document.body.append(overlay);
+  }
+  function openSale(card, panel) {
+    const sale = document.createElement('div');
+    sale.className = 'fixed inset-0';
+    sale.setAttribute('role', 'dialog');
+    sale.style.zIndex = '10';
+    sale.innerHTML = '<div class="backdrop"></div><div class="panel"><h2>Mettre aux enchères</h2><p></p><input type="number" value="120" min="1"><div class="actions"><button data-confirm>Mettre en vente</button><button data-cancel>Annuler</button></div></div>';
+    sale.querySelector('p').textContent = card.title;
+    sale.querySelector('[data-cancel]').addEventListener('click', () => sale.remove());
+    sale.querySelector('[data-confirm]').addEventListener('click', () => {
+      sale.remove();
+      panel.remove();
+      const toast = document.createElement('div');
+      toast.setAttribute('role', 'status');
+      toast.textContent = 'Carte mise aux enchères (maquette)';
+      toast.style.cssText = 'position:fixed;left:50%;bottom:24px;translate:-50% 0;padding:10px 14px;border-radius:10px;background:#2b2b30';
+      document.body.append(toast);
+      setTimeout(() => toast.remove(), 2500);
+    });
+    document.body.append(sale);
+  }
+
+  document.querySelector('input').addEventListener('input', event => { query = event.target.value; page = 0; render(); });
+  next.addEventListener('click', () => { page += 1; render(); });
+  document.addEventListener('wme:scan', () => {});
+  render();
+</script>
+</body>
+</html>

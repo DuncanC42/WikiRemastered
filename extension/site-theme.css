@@ -1,0 +1,610 @@
+/* Wiki Masters component skin.
+   Authority: guide-design-composants.md; native brand accent stays green.
+   Only classified controls and real native components are styled here.
+   Layout, navigation and page-specific rhythm live in site-pages.css.
+   Illustrated cards keep their fonts, rarity colors and gameplay effects. */
+
+html[data-wme-theme='graphite'],
+html.light[data-wme-theme='graphite'],
+html[data-wme-theme='graphite'] body {
+  --color-background: #111113 !important;
+  --color-foreground: #f5f5f7 !important;
+  --color-surface: #17171a !important;
+  --color-surface-light: #232327 !important;
+  --color-border: rgb(245 245 247 / 8%) !important;
+  --color-accent: #34d399 !important;
+  --color-accent-light: #6ee7b7 !important;
+  --color-accent-foreground: #062b1e !important;
+  --wme-site-panel: #17171a;
+  --wme-site-surface: #1c1c20;
+  --wme-site-raised: #232327;
+  --wme-site-muted: #a1a1aa;
+  --wme-site-dim: #7c7c86;
+  --wme-site-line: rgb(245 245 247 / 4.5%);
+  --wme-site-hover: rgb(245 245 247 / 6%);
+  --wme-site-edge: rgb(245 245 247 / 7%);
+  --wme-site-shadow: rgb(5 5 8 / 38%);
+  --wme-site-danger: #ff6a6a;
+  --wme-site-warning: #f59e0b;
+  --wme-site-font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --wme-site-ease: cubic-bezier(.2, 0, 0, 1);
+  color-scheme: dark !important;
+}
+
+html[data-wme-theme='graphite'] {
+  background-color: var(--color-background);
+  scrollbar-color: #47474f var(--color-background);
+}
+
+html[data-wme-theme='graphite'] body {
+  background-color: var(--color-background) !important;
+  color: var(--color-foreground) !important;
+  font-family: var(--wme-site-font) !important;
+  -webkit-font-smoothing: antialiased;
+}
+
+html[data-wme-theme='graphite'] [data-wme-card-art] {
+  font-family: var(--font-body, 'Inter', sans-serif);
+}
+
+html[data-wme-theme='graphite'] :is(h1, h2, h3, h4, h5, h6, [style*='--font-heading']):not([data-wme-card-art], [data-wme-card-art] *, .wr-body, .wr-body *, .wr-aside, .wr-aside *, .recharts-wrapper, .recharts-wrapper *, .recharts-surface, .recharts-surface *) {
+  font-family: var(--wme-site-font) !important;
+}
+
+/* Native hardcoded translucent/light frames are real panels, not card art. */
+html[data-wme-theme='graphite'] :is(.card-frame, .card-frame-solid, [data-wme-surface='panel']):not([data-wme-card-art], [data-wme-card-art] *) {
+  background: var(--wme-site-panel) !important;
+  border-radius: 12px !important;
+  box-shadow: inset 0 1px 0 var(--wme-site-edge), 0 1px 2px rgb(5 5 8 / 18%) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html[data-wme-theme='graphite'] :is(.card-frame, .card-frame-solid, [data-wme-surface='panel']):not([data-wme-card-art], [data-wme-card-art] *, [class~='border-red-500/30']) {
+  border-color: var(--color-border) !important;
+}
+
+/* Observed account-danger panel. Also wins against html.light .card-frame. */
+html[data-wme-theme='graphite'] .card-frame[class~='border-red-500/30']:not([data-wme-card-art], [data-wme-card-art] *) {
+  border-color: rgb(255 106 106 / 30%) !important;
+}
+
+html[data-wme-theme='graphite'] [data-wme-surface='raised']:not([data-wme-card-art], [data-wme-card-art] *) {
+  background: var(--wme-site-raised) !important;
+  border-color: var(--color-border) !important;
+  border-radius: 10px !important;
+  box-shadow: inset 0 1px 0 var(--wme-site-edge), 0 1px 2px var(--wme-site-shadow) !important;
+}
+
+/* Common control material. Quiet row actions keep their original dimensions. */
+html[data-wme-theme='graphite'] [data-wme-control]:not([data-wme-card-art], [data-wme-card-art] *) {
+  border-radius: 8px !important;
+  font-family: var(--wme-site-font) !important;
+  font-weight: 550;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html[data-wme-theme='graphite'] :is([data-wme-control='primary'], [data-wme-control='secondary'], [data-wme-control='danger']):not([data-wme-icon], [data-wme-card-art], [data-wme-card-art] *) {
+  min-height: 34px;
+  padding: 7px 12px;
+  border: 1px solid transparent !important;
+  font-size: 13px;
+  line-height: 1.4;
+  font-weight: 600;
+  text-decoration: none !important;
+}
+
+html[data-wme-theme='graphite'] [data-wme-control='primary']:not([data-wme-card-art], [data-wme-card-art] *) {
+  background: linear-gradient(180deg, rgb(245 245 247 / 13%), transparent 62%), var(--color-accent) !important;
+  color: var(--color-accent-foreground) !important;
+  box-shadow: inset 0 1px 0 rgb(245 245 247 / 28%), inset 0 -1px 0 rgb(6 43 30 / 20%), 0 1px 3px var(--wme-site-shadow) !important;
+}
+
+html[data-wme-theme='graphite'] [data-wme-control='secondary']:not([data-wme-card-art], [data-wme-card-art] *) {
+  background: var(--wme-site-raised) !important;
+  color: var(--color-foreground) !important;
+  box-shadow: inset 0 1px 0 var(--wme-site-edge), inset 0 -1px 0 rgb(5 5 8 / 15%), 0 1px 2px var(--wme-site-shadow) !important;
+}
+
+html[data-wme-theme='graphite'] [data-wme-control='danger']:not([data-wme-card-art], [data-wme-card-art] *) {
+  background: #352124 !important;
+  color: var(--wme-site-danger) !important;
+  box-shadow: inset 0 1px 0 rgb(255 106 106 / 10%), 0 1px 2px var(--wme-site-shadow) !important;
+}
+
+html[data-wme-theme='graphite'] :is([data-wme-control='quiet'], [data-wme-control='icon']):not([data-wme-card-art], [data-wme-card-art] *) {
+  background: transparent !important;
+  color: var(--wme-site-muted) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+html[data-wme-theme='graphite'] :is([data-wme-control='choice'], [role='option']):not([data-wme-color-label], [data-wme-rarity-choice], [data-wme-card-art], [data-wme-card-art] *) {
+  color: var(--wme-site-muted);
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+html[data-wme-theme='graphite'] :is([data-wme-control='choice'][data-wme-selected='true'], [data-wme-control='choice'][aria-pressed='true'], [role='option'][aria-selected='true']):not([data-wme-color-label], [data-wme-rarity-choice], [data-wme-card-art], [data-wme-card-art] *) {
+  background: rgb(52 211 153 / 12%) !important;
+  color: var(--color-accent-light) !important;
+  box-shadow: inset 0 1px 0 rgb(110 231 183 / 7%) !important;
+}
+
+html[data-wme-theme='graphite'] :is([data-wme-control], [data-wme-input], [data-wme-range], [data-wme-switch], [data-wme-rarity-choice], [role='switch'], input[type='checkbox'], input[type='radio']):not([data-wme-card-art], [data-wme-card-art] *):focus-visible {
+  outline: 2px solid var(--color-accent-light) !important;
+  outline-offset: 3px !important;
+}
+
+html[data-wme-theme='graphite'] :is([data-wme-control], [data-wme-input], [data-wme-range], [data-wme-switch], [role='switch']):is(:disabled, [aria-disabled='true']):not([data-wme-card-art], [data-wme-card-art] *) {
+  opacity: .42 !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+}
+
+html[data-wme-theme='graphite'] [data-wme-control][aria-busy='true']:not([data-wme-card-art], [data-wme-card-art] *) {
+  opacity: .7;
+  cursor: progress;
+}
+
+/* Native market/collection tabs retain their real buttons and ARIA state. */
+html[data-wme-theme='graphite'] [data-wme-tabs]:not([data-wme-card-art], [data-wme-card-art] *) {
+  padding: 3px;
+  border: 0 !important;
+  border-radius: 10px;
+  background: var(--wme-site-surface) !important;
+  box-shadow: inset 0 1px 2px rgb(5 5 8 / 18%);
+}
+
+html[data-wme-theme='graphite'] [data-wme-tabs] > :is(button, a, [role='tab']):not([data-wme-card-art], [data-wme-card-art] *) {
+  border: 0 !important;
+  border-radius: 7px !important;
+  background: transparent !important;
+  color: var(--wme-site-muted) !important;
+  box-shadow: none !important;
+}
+
+html[data-wme-theme='graphite'] [data-wme-tabs] > :is([data-wme-selected='true'], [aria-selected='true'], [aria-current='page']):not([data-wme-card-art], [data-wme-card-art] *) {
+  background: var(--wme-site-raised) !important;
+  color: var(--color-foreground) !important;
+  box-shadow: inset 0 1px 0 var(--wme-site-edge), 0 1px 3px var(--wme-site-shadow) !important;
+}
+
+/* Preserve native field heights where a search/filter layout already owns them. */
+html[data-wme-theme='graphite'] [data-wme-input]:not([data-wme-card-art], [data-wme-card-art] *) {
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-radius: 8px !important;
+  background-color: var(--wme-site-raised) !important;
+  color: var(--color-foreground) !important;
+  box-shadow: inset 0 1px 2px rgb(5 5 8 / 16%), inset 0 1px 0 rgb(245 245 247 / 3%) !important;
+  font-family: var(--wme-site-font) !important;
+  font-size: 16px !important;
+  line-height: 1.45;
+  caret-color: var(--color-accent-light);
+}
+
+html[data-wme-theme='graphite'] [data-wme-input]:not([data-wme-card-art], [data-wme-card-art] *, [class~='border-amber-500/50']) {
+  border-color: var(--color-border) !important;
+}
+
+html[data-wme-theme='graphite'] [data-wme-input]:not([data-wme-card-art], [data-wme-card-art] *)::placeholder {
+  color: var(--wme-site-muted) !important;
+  opacity: 1 !important;
+}
+
+html[data-wme-theme='graphite'] textarea[data-wme-input]:not([data-wme-card-art], [data-wme-card-art] *) { resize: vertical; }
+
+/* Native selects (e.g. marketplace sort) read as the site's other fields:
+   same height and type as the filter buttons, a quiet chevron, dark menu. */
+html[data-wme-theme='graphite'] select[data-wme-input]:not([data-wme-card-art], [data-wme-card-art] *) {
+  min-height: 36px;
+  padding-block: 6px !important;
+  padding-inline: 12px 34px !important;
+  color-scheme: dark;
+  font-size: 14px !important;
+  font-weight: 500;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none' stroke='%23a1a1aa' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 4.5 6 7.5 9 4.5'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 12px center !important;
+  background-size: 12px !important;
+  cursor: pointer;
+  transition: background-color 120ms cubic-bezier(.2, 0, 0, 1);
+}
+
+/* The site's own chevron stays when it draws one. */
+html[data-wme-theme='graphite'] select[data-wme-input]:has(~ svg):not([data-wme-card-art], [data-wme-card-art] *) {
+  background-image: none !important;
+}
+
+@media (hover: hover) {
+  html[data-wme-theme='graphite'] select[data-wme-input]:not(:disabled, [data-wme-card-art], [data-wme-card-art] *):hover {
+    background-color: #2a2a2f !important;
+  }
+}
+
+html[data-wme-theme='graphite'] select[data-wme-input]:not([data-wme-card-art], [data-wme-card-art] *) option {
+  background: var(--wme-site-raised);
+  color: var(--color-foreground);
+}
+
+html[data-wme-theme='graphite'] [data-wme-input][aria-invalid='true']:not([data-wme-card-art], [data-wme-card-art] *) {
+  border-color: var(--wme-site-danger) !important;
+}
+
+html[data-wme-theme='graphite'] :is(label, legend):has([data-wme-input]):not([data-wme-card-art], [data-wme-card-art] *) {
+  color: var(--wme-site-muted);
+}
+
+html[data-wme-theme='graphite'] label[for]:not([data-wme-card-art], [data-wme-card-art] *) {
+  color: var(--wme-site-muted);
+  font-family: var(--wme-site-font);
+  font-weight: 500;
+}
+
+html[data-wme-theme='graphite'] input[data-wme-input]:not([data-wme-card-art], [data-wme-card-art] *)::file-selector-button {
+  margin-right: 12px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: #303035;
+  color: var(--color-foreground);
+  font-family: var(--wme-site-font);
+  box-shadow: inset 0 1px 0 var(--wme-site-edge), 0 1px 2px var(--wme-site-shadow);
+}
+
+html[data-wme-theme='graphite'] :is(input[type='checkbox'], input[type='radio']):not([data-wme-card-art], [data-wme-card-art] *) {
+  accent-color: var(--color-accent);
+  color-scheme: dark;
+}
+
+/* Skin the 48 x 24 native switch without changing its thumb translation. */
+html[data-wme-theme='graphite'] :is([role='switch'], [data-wme-switch]):not([data-wme-card-art], [data-wme-card-art] *) {
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: #34343b !important;
+  box-shadow: inset 0 1px 2px rgb(5 5 8 / 25%) !important;
+}
+
+html[data-wme-theme='graphite'] :is([role='switch'][aria-checked='true'], [data-wme-switch][data-wme-selected='true']):not([data-wme-card-art], [data-wme-card-art] *) {
+  border-color: transparent !important;
+  background: var(--color-accent) !important;
+}
+
+/* Real range input, same value/events as the site. Fill is set by site-theme.js. */
+html[data-wme-theme='graphite'] input[data-wme-range]:not([data-wme-card-art], [data-wme-card-art] *) {
+  height: 28px;
+  padding: 3px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--wme-site-raised);
+  box-shadow: inset 0 1px 0 var(--wme-site-edge), inset 0 -1px 0 rgb(5 5 8 / 20%);
+  -webkit-appearance: none;
+  appearance: none;
+  accent-color: var(--color-accent);
+  cursor: pointer;
+}
+
+html[data-wme-theme='graphite'] input[data-wme-range]:not([data-wme-card-art], [data-wme-card-art] *)::-webkit-slider-runnable-track {
+  height: 22px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgb(52 211 153 / 24%) var(--wme-range-fill, 0%), transparent var(--wme-range-fill, 0%));
+}
+
+html[data-wme-theme='graphite'] input[data-wme-range]:not([data-wme-card-art], [data-wme-card-art] *)::-webkit-slider-thumb {
+  width: 3px;
+  height: 14px;
+  margin-top: 4px;
+  border: 0;
+  border-radius: 2px;
+  background: var(--color-foreground);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+html[data-wme-theme='graphite'] input[data-wme-range]:not([data-wme-card-art], [data-wme-card-art] *)::-moz-range-track {
+  height: 22px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgb(52 211 153 / 24%) var(--wme-range-fill, 0%), transparent var(--wme-range-fill, 0%));
+}
+
+html[data-wme-theme='graphite'] input[data-wme-range]:not([data-wme-card-art], [data-wme-card-art] *)::-moz-range-thumb {
+  width: 3px;
+  height: 14px;
+  border: 0;
+  border-radius: 2px;
+  background: var(--color-foreground);
+}
+
+/* Portals keep positioning, dismissal and focus logic from Wiki Masters. */
+html[data-wme-theme='graphite'] :is([data-wme-surface='dialog'], dialog):not([data-wme-card-art], [data-wme-card-art] *) {
+  border: 1px solid var(--color-border) !important;
+  border-radius: 18px !important;
+  background: var(--wme-site-panel) !important;
+  color: var(--color-foreground);
+  box-shadow: inset 0 1px 0 var(--wme-site-edge), 0 20px 64px rgb(5 5 8 / 45%) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html[data-wme-theme='graphite'] dialog:not([data-wme-card-art], [data-wme-card-art] *)::backdrop {
+  background: rgb(5 5 8 / 65%);
+}
+
+html[data-wme-theme='graphite'] [data-wme-backdrop]:not([data-wme-card-art], [data-wme-card-art] *) {
+  background-color: rgb(5 5 8 / 65%) !important;
+}
+
+html[data-wme-theme='graphite'] :is([data-wme-surface='menu'], [role='menu'], [role='listbox']):not([data-wme-card-art], [data-wme-card-art] *) {
+  border: 1px solid var(--color-border) !important;
+  border-radius: 8px !important;
+  background: var(--wme-site-raised) !important;
+  color: var(--color-foreground);
+  box-shadow: inset 0 1px 0 var(--wme-site-edge), 0 8px 28px rgb(5 5 8 / 38%) !important;
+}
+
+html[data-wme-theme='graphite'] :is([role='menuitem'], [role='option']):not([data-wme-card-art], [data-wme-card-art] *) {
+  border-radius: 5px;
+  font-family: var(--wme-site-font);
+}
+
+html[data-wme-theme='graphite'] [data-wme-surface='toast']:not([data-wme-card-art], [data-wme-card-art] *) {
+  border-color: var(--color-border) !important;
+  border-radius: 10px !important;
+  background: var(--wme-site-raised) !important;
+  box-shadow: inset 0 1px 0 var(--wme-site-edge), 0 6px 24px rgb(5 5 8 / 28%) !important;
+}
+
+html[data-wme-theme='graphite'] :is([role='tooltip'], [data-wme-surface='tooltip']):not([data-wme-card-art], [data-wme-card-art] *) {
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--wme-site-raised) !important;
+  color: var(--color-foreground) !important;
+  font-family: var(--wme-site-font);
+  font-size: 12px;
+  line-height: 1.45;
+  box-shadow: 0 4px 14px rgb(5 5 8 / 24%);
+}
+
+/* Filters keep real rarity swatches; only their control geometry is shared. */
+html[data-wme-theme='graphite'] [data-wme-color-label]:not([data-wme-card-art], [data-wme-card-art] *) {
+  border-radius: 6px !important;
+  font-family: var(--wme-site-font);
+}
+
+html[data-wme-theme='graphite'] [data-wme-rarity-choice]:not([data-wme-card-art], [data-wme-card-art] *) {
+  padding: 6px 10px;
+  border-radius: 6px !important;
+}
+
+/* Informational blue UI becomes brand green. Chart/game colors are not tagged. */
+html[data-wme-theme='graphite'] [data-wme-info-text]:not([data-wme-color-label], [data-wme-control='primary'], [data-wme-card-art], [data-wme-card-art] *) {
+  color: var(--color-accent-light) !important;
+}
+
+html[data-wme-theme='graphite'] [data-wme-info-bg]:not([data-wme-color-label], [data-wme-control='primary'], [data-wme-card-art], [data-wme-card-art] *) {
+  background-color: rgb(52 211 153 / 16%) !important;
+}
+
+html[data-wme-theme='graphite'] [data-wme-info-border]:not([data-wme-color-label], [data-wme-control='primary'], [data-wme-card-art], [data-wme-card-art] *) {
+  border-color: rgb(52 211 153 / 32%) !important;
+}
+
+/* Flat lists/tables retain their content, semantic colors and column layout. */
+html[data-wme-theme='graphite'] :is(table, [role='table']):not([data-wme-card-art], [data-wme-card-art] *, .wr-body *, .wr-aside *) {
+  font-variant-numeric: tabular-nums;
+  border-color: var(--wme-site-line);
+}
+
+html[data-wme-theme='graphite'] :is(th, [role='columnheader']):not([data-wme-card-art], [data-wme-card-art] *, .wr-body *, .wr-aside *) {
+  background: var(--wme-site-surface);
+  color: var(--wme-site-muted);
+  font-weight: 500;
+}
+
+html[data-wme-theme='graphite'] :is(td, [role='cell']):not([data-wme-card-art], [data-wme-card-art] *, .wr-body *, .wr-aside *) {
+  border-color: var(--wme-site-line);
+}
+
+html[data-wme-theme='graphite'] :is([role='status'], [role='alert']):not([data-wme-card-art], [data-wme-card-art] *) {
+  font-family: var(--wme-site-font);
+  line-height: 1.45;
+}
+
+@media (hover: hover) {
+  html[data-wme-theme='graphite'] [data-wme-control='primary']:not(:disabled, [aria-disabled='true'], [data-wme-card-art], [data-wme-card-art] *):hover {
+    background: #49dba6 !important;
+  }
+  html[data-wme-theme='graphite'] [data-wme-control='secondary']:not(:disabled, [aria-disabled='true'], [data-wme-card-art], [data-wme-card-art] *):hover {
+    background: #2b2b30 !important;
+  }
+  html[data-wme-theme='graphite'] [data-wme-control='danger']:not(:disabled, [aria-disabled='true'], [data-wme-card-art], [data-wme-card-art] *):hover {
+    background: #48282c !important;
+  }
+  html[data-wme-theme='graphite'] :is([data-wme-control='quiet'], [data-wme-control='icon'], [role='menuitem'], [role='option']):not(:disabled, [aria-disabled='true'], [aria-selected='true'], [data-wme-color-label], [data-wme-rarity-choice], [data-wme-card-art], [data-wme-card-art] *):hover {
+    background: var(--wme-site-hover) !important;
+    color: var(--color-foreground) !important;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html[data-wme-theme='graphite'] :is([data-wme-control='primary'], [data-wme-control='secondary'], [data-wme-control='danger']):not([data-wme-positioned], [data-wme-card-art], [data-wme-card-art] *) {
+    transition: transform 120ms var(--wme-site-ease), opacity 120ms var(--wme-site-ease);
+  }
+  html[data-wme-theme='graphite'] :is([data-wme-control='primary'], [data-wme-control='secondary'], [data-wme-control='danger']):not(:disabled, [aria-disabled='true'], [data-wme-positioned], [data-wme-card-art], [data-wme-card-art] *):active {
+    transform: scale(.985);
+    box-shadow: inset 0 1px 2px rgb(5 5 8 / 28%) !important;
+  }
+  html[data-wme-theme='graphite'] [data-wme-surface='menu']:not([data-wme-card-art], [data-wme-card-art] *) {
+    animation: wme-menu-appear 180ms var(--wme-site-ease);
+  }
+  @keyframes wme-menu-appear {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+}
+
+@media (max-width: 639.98px) {
+  /* Native shop bottom sheet: round the top, keep the viewport edge flush. */
+  html[data-wme-theme='graphite'] :is([data-wme-surface='dialog'], dialog).rounded-t-2xl:not([data-wme-card-art], [data-wme-card-art] *) {
+    border-radius: 18px 18px 0 0 !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-wme-theme='graphite'] :is([data-wme-control], [data-wme-surface='menu']):not([data-wme-card-art], [data-wme-card-art] *) {
+    transition-duration: 0s !important;
+    animation: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  html[data-wme-theme='graphite'] :is([data-wme-control], [data-wme-input], [data-wme-surface]):not([data-wme-card-art], [data-wme-card-art] *) {
+    border: 1px solid ButtonText !important;
+  }
+}
+
+/* Subscription integrations are hidden locally, without altering account rights. */
+html[data-wme-theme='graphite'] :is([data-wme-pro], [aria-labelledby='pro-subscription-heading'], a[href*='#pro-subscription-heading']) {
+  display: none !important;
+}
+
+/* A number stepper is one field, not an input nested inside another input. */
+html[data-wme-theme='graphite'] [data-wme-stepper] {
+  box-sizing: border-box;
+  display: flex;
+  align-items: stretch;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  gap: 0;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 10px !important;
+  background: var(--wme-site-raised) !important;
+  box-shadow: inset 0 1px 0 var(--wme-site-edge), 0 1px 2px var(--wme-site-shadow) !important;
+  overflow: hidden;
+}
+
+html[data-wme-theme='graphite'] [data-wme-stepper]:focus-within {
+  outline: 2px solid var(--color-accent-light);
+  outline-offset: 2px;
+}
+
+html[data-wme-theme='graphite'] [data-wme-stepper] > input[data-wme-input] {
+  flex: 1 1 0%;
+  width: 0;
+  min-width: 0;
+  height: 100%;
+  padding: 0 12px;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+  font-weight: 550;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  appearance: textfield;
+}
+
+html[data-wme-theme='graphite'] [data-wme-stepper] > button[data-wme-control] {
+  flex: 0 0 44px;
+  width: 44px;
+  min-height: 0;
+  padding: 0;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--color-foreground) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+html[data-wme-theme='graphite'] [data-wme-stepper] > button:first-child { border-right: 1px solid var(--color-border) !important; }
+html[data-wme-theme='graphite'] [data-wme-stepper] > button:last-child { border-left: 1px solid var(--color-border) !important; }
+html[data-wme-theme='graphite'] [data-wme-stepper] > button[data-wme-control]:enabled:hover { background: var(--wme-site-hover) !important; }
+html[data-wme-theme='graphite'] [data-wme-stepper] > span { color: var(--wme-site-muted); }
+
+/* Search and native dropdown triggers share an exact 44px control height. */
+html[data-wme-theme='graphite'] [data-wme-collection-filters] :is(input[data-wme-input], button[aria-haspopup='listbox']) {
+  box-sizing: border-box;
+  height: 44px !important;
+  min-height: 44px !important;
+  max-height: 44px;
+  padding-block: 0 !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 8px !important;
+  background: var(--wme-site-raised) !important;
+  color: var(--color-foreground) !important;
+  box-shadow: inset 0 1px 0 var(--wme-site-edge) !important;
+  line-height: 1.45;
+}
+
+/* Numbered reveal pagination keeps native handlers and visited/active state. */
+html[data-wme-theme='graphite'] [data-wme-reveal-pages] {
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: calc(100vw - 144px);
+}
+html[data-wme-theme='graphite'] [data-wme-reveal-pages] > button[data-wme-page-index] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 34px;
+  min-height: 34px;
+  padding: 0;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 7px !important;
+  background: var(--wme-site-raised) !important;
+  color: var(--color-foreground) !important;
+  box-shadow: inset 0 1px 0 var(--wme-site-edge) !important;
+  font: 600 13px/1 var(--wme-site-font);
+  font-variant-numeric: tabular-nums;
+  opacity: 1 !important;
+  transform: none !important;
+}
+html[data-wme-theme='graphite'] [data-wme-reveal-pages] > button[data-wme-page-index]::before { content: attr(data-wme-page-index); }
+html[data-wme-theme='graphite'] [data-wme-reveal-pages] > button[data-wme-page-active='true'] {
+  background: var(--color-accent) !important;
+  color: var(--color-accent-foreground) !important;
+  border-color: transparent !important;
+}
+
+/* Normal pack: the extension's art replaces the rendered image only, in the design picked in the
+   opening (the puzzle pack by default, the dark foil one, or the site's own).
+   The native <img>, its src, handlers and reveal animations are untouched. */
+html[data-wme-theme='graphite']:not([data-wme-pack-style='classic']) main button img[alt='Ouvrir un paquet'] {
+  content: url('chrome-extension://__MSG_@@extension_id__/pack-art-puzzle.svg');
+  filter: drop-shadow(0 18px 22px rgb(0 0 0 / 50%)) !important;
+}
+html[data-wme-theme='graphite'][data-wme-pack-style='dark'] main button img[alt='Ouvrir un paquet'] {
+  content: url('chrome-extension://__MSG_@@extension_id__/pack-art.svg');
+}
+
+/* The WikiRemastered logo in place of the site's "WikiMasters" wordmark (see site-theme.js): a
+   heavy 3D wordmark with a print grain, like the puzzle pack's pieces, the site's green leading.
+   Its capitals are about as tall as the wordmark's (.82 em for the whole image) and it grows to
+   its own width (1266 × 128, as scripts/brand.mjs draws it: keep in step); the words stay for
+   screen readers. */
+html[data-wme-theme='graphite'] [data-wme-logo] {
+  position: relative;
+  display: inline-block;
+  width: calc(.82em * 1266 / 128);
+  height: .82em;
+  background: url('chrome-extension://__MSG_@@extension_id__/logo-wikiremastered.svg') left center / contain no-repeat;
+  color: transparent !important;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+html[data-wme-theme='graphite'] [data-wme-logo] > span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}

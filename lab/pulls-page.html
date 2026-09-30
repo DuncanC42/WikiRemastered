@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Labo · Page Paquets</title>
+<!-- Snapshot of the native /pulls markup (27 September 2026) with the extension's theme. -->
+<link rel="stylesheet" href="https://www.wiki-masters.com/_next/static/chunks/01o20bc6533hn.css">
+<link rel="stylesheet" href="https://www.wiki-masters.com/_next/static/chunks/0e34orysrjk_z.css">
+<link rel="stylesheet" href="../extension/site-theme.css">
+<link rel="stylesheet" href="../extension/site-pages.css">
+<style>
+  /* In the extension this URL is chrome-extension://…/pack-art.svg. */
+  html[data-wme-theme='graphite']:not([data-wme-pack-style='classic']) main button img[alt='Ouvrir un paquet'] { content: url('../extension/pack-art.svg'); }
+  body { margin: 0; min-height: 100dvh; display: flex; }
+  main { flex: 1; display: flex; }
+</style>
+</head>
+<body>
+<main>
+  <div class="flex-1 flex flex-col items-center justify-center gap-4 md:gap-8 p-4 md:p-6">
+    <div class="text-center animate-fade-in-up">
+      <h1 class="text-3xl md:text-4xl font-bold mb-2" style="font-family: var(--font-heading);">Ouvrir un paquet</h1>
+      <p class="text-[var(--color-foreground)]/50 text-sm">Découvrez 5 nouvelles cartes Wikipédia</p>
+      <div class="mt-2 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs"><button class="text-[var(--color-accent)]/70 hover:text-[var(--color-accent)] transition-colors cursor-pointer">Comment ça marche ?</button></div>
+    </div>
+    <button class="relative flex flex-col items-center justify-center gap-4 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] hover:scale-105 hover:-translate-y-2 drop-shadow-xl hover:drop-shadow-[0_10px_25px_rgba(0,0,0,0.3)]"><img alt="Ouvrir un paquet" width="384" height="384" class="w-64 h-64 md:w-72 md:h-72 object-contain filter drop-shadow-[0_0_15px_rgba(250,153,49,0.35)] pointer-events-none" src="https://www.wiki-masters.com/card_pack.png"><span class="text-lg md:text-xl font-bold text-[var(--color-accent)] drop-shadow-md">Ouvrir</span></button>
+    <div class="flex flex-col items-center gap-3 animate-fade-in-up">
+      <div class="card-frame px-6 py-3 flex flex-col items-center gap-1 text-center">
+        <div class="text-lg font-bold"><span class="text-[var(--color-accent)]">5</span><span class="text-[var(--color-foreground)]/40"> / 10</span></div>
+        <div class="text-xs text-[var(--color-foreground)]/40">paquets disponibles</div>
+        <div class="text-xs text-[var(--color-foreground)]/40">Prochain dans <span class="text-[var(--color-accent)] font-mono">4:18</span></div>
+      </div>
+    </div>
+  </div>
+</main>
+<script>
+  // Pretend to be on /pulls for site-theme.js (relative URLs still resolve from
+  // the server root), and tick the native countdown.
+  history.replaceState(null, '', '/pulls');
+  let seconds = 258;
+  setInterval(() => {
+    seconds = seconds > 0 ? seconds - 1 : 599;
+    document.querySelector('.font-mono').textContent = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+  }, 1000);
+</script>
+<script src="../extension/site-theme.js"></script>
+</body>
+</html>

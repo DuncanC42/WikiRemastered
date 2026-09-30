@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Labo · Ouverture de paquets</title>
+<style>
+  :root { color-scheme: dark; --font-heading: "Outfit", system-ui, sans-serif; }
+  body { margin: 0; min-height: 100dvh; display: grid; place-items: center; background: #111113; color: #f5f5f7; font: 14px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; }
+  main { display: grid; gap: 20px; justify-items: center; padding: 24px 16px; max-width: 640px; text-align: center; }
+  h1 { margin: 0; font-size: 22px; }
+  p { margin: 0; color: #a1a1aa; }
+  .grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+  button { font: inherit; font-weight: 600; color: #f5f5f7; background: #232327; border: 0; border-radius: 10px; min-height: 40px; padding: 0 14px; cursor: pointer; box-shadow: inset 0 1px 0 rgb(255 255 255 / .08), 0 0 0 1px rgb(255 255 255 / .07); }
+  button:hover { background: #2c2c31; }
+  #pack { background: none; box-shadow: none; padding: 0; }
+  #pack img { height: 256px; filter: drop-shadow(0 18px 22px rgb(0 0 0 / 50%)); }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+<main>
+  <h1>Labo d’ouverture</h1>
+  <p>Réponses simulées au format réel de <code>/api/packs/open</code>. Aucun paquet n’est consommé.</p>
+  <button id="pack" type="button" aria-label="Ouvrir un paquet simulé"><img alt="" src="../extension/pack-art-puzzle.svg"></button>
+  <div class="grid" id="scenarios"></div>
+</main>
+<script type="module">
+import { openPackExperience } from '../extension/pack-opening.js';
+import { normalizePackResponse } from '../extension/pack-cards.js';
+
+const ORIGIN = 'https://www.wiki-masters.com';
+const pool = {
+  C: [
+    { wikipedia_title: 'Sheik (homonymie)', category: "page d'homonymie de Wikimédia", image_url: null, atk: 1473, def: 229, pageviews: 15 },
+    { wikipedia_title: 'Gabriel Zendel', category: 'peintre et lithographe français (1906-1992)', image_url: null, atk: 2170, def: 5469, pageviews: 41 },
+    { wikipedia_title: "Équipe d'Autriche masculine de hockey sur gazon", summary: "L'équipe d'Autriche masculine de hockey sur gazon est l'équipe nationale qui représente l'Autriche.", image_url: 'https://upload.wikimedia.org/wikipedia/fr/thumb/8/82/F%C3%A9d%C3%A9ration_autrichienne_de_hockey_logo.png/330px-F%C3%A9d%C3%A9ration_autrichienne_de_hockey_logo.png', atk: 1884, def: 2693, pageviews: 4 },
+    { wikipedia_title: 'Abeille', category: 'insecte pollinisateur', image_url: `${ORIGIN}/cards/abeille.jpg`, atk: 2210, def: 3120, pageviews: 8290 },
+  ],
+  PC: [
+    { wikipedia_title: 'Patrick Ouotro', image_url: null, atk: 3254, def: 4352, pageviews: 176 },
+    { wikipedia_title: 'Adieu je reste !', category: 'pièce de théâtre', image_url: null, atk: 2570, def: 1132, pageviews: 138 },
+  ],
+  R: [{ wikipedia_title: 'Ada Lovelace', category: 'mathématicienne britannique', image_url: `${ORIGIN}/cards/ada-lovelace.png`, atk: 5090, def: 7780, pageviews: 5820 }],
+  SR: [{ wikipedia_title: 'Championnat du monde de blitz', category: 'compétition d’échecs', image_url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Schachweltelite_auf_dem_Podium_zur_Blitzschach-WM_Berlin_2015.JPG/330px-Schachweltelite_auf_dem_Podium_zur_Blitzschach-WM_Berlin_2015.JPG', atk: 6222, def: 5935, pageviews: 3250 }],
+  UR: [{ wikipedia_title: 'Albert Einstein', category: 'physicien théoricien germano-américain', image_url: `${ORIGIN}/cards/albert-einstein.jpg`, atk: 7470, def: 8120, pageviews: 98120 }],
+  L: [{ wikipedia_title: 'Grande Muraille', category: 'Ensemble de fortifications militaires construites pour marquer et défendre la frontière nord de la Chine', image_url: `${ORIGIN}/cards/grande-muraille.jpg`, atk: 8970, def: 6120, pageviews: 142000 }],
+};
+
+const scenarios = {
+  'Paquet commun': ['C', 'C', 'C', 'PC', 'PC'],
+  'Rare': ['C', 'C', 'PC', 'PC', 'R'],
+  'Super rare': ['C', 'C', 'PC', 'R', 'SR'],
+  'Ultra rare': ['C', 'PC', 'PC', 'R', 'UR'],
+  'Légendaire': ['C', 'C', 'PC', 'SR', 'L'],
+  'Shiny rare': ['C', 'C', 'PC', 'PC', 'R*'],
+  'Double légendaire': ['C', 'PC', 'L', 'UR', 'L*'],
+  'Vérification requise': 'verification',
+  'Résultat incertain': 'uncertain',
+};
+
+let stock = 7;
+let current = 'Légendaire';
+let counter = 0;
+
+// Owned copies get real UUIDs, so the extension's favorite and card-panel flows can find
+// them in lab/collection-mock.html, a stand-in for the site's own collection page.
+const ACCOUNT = '00000000-0000-4000-8000-00000000a001';
+document.documentElement.setAttribute('data-wme-account', ACCOUNT);
+const uuid = n => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
+let copyNumber = 100;
+function remember(cards, owned) {
+  let collection = [];
+  try { collection = JSON.parse(localStorage.getItem('wme-lab-collection')) || []; } catch {}
+  for (const [index, card] of cards.entries()) {
+    collection.push({ id: owned[index].id, title: card.wikipedia_title, rarity: card.rarity, category: card.category || '', starred: false });
+  }
+  try { localStorage.setItem('wme-lab-collection', JSON.stringify(collection.slice(-60))); } catch {}
+}
+
+function payload(spec) {
+  const cards = spec.map((code, index) => {
+    const rarity = code.replace('*', '');
+    const base = pool[rarity][index % pool[rarity].length];
+    return { id: `card-${counter}-${index}`, rarity, rarity_order: ['C', 'PC', 'R', 'SR', 'UR', 'L'].indexOf(rarity), hide_image: false, nsfw_image: false, lang: 'fr', summary: null, category: null, ...base };
+  });
+  counter += 1;
+  const owned = cards.map((card, index) => ({ id: uuid(copyNumber += 1), card_id: card.id, starred: false, is_shiny: spec[index].endsWith('*'), user_card_tags: [] }));
+  remember(cards, owned);
+  return {
+    cards,
+    packs_remaining: Math.max(0, stock - 1),
+    packs_last_regen_at: new Date().toISOString(),
+    owned_copies: owned,
+  };
+}
+
+// ?delay=3000 slows the simulated server down, to look at the open pack while it waits.
+const extraDelay = Number(new URLSearchParams(location.search).get('delay')) || 0;
+async function requestOpen() {
+  await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 600 + extraDelay));
+  const spec = scenarios[current];
+  if (spec === 'verification') throw Object.assign(new Error('Vérification requise.'), { kind: 'verification' });
+  if (spec === 'uncertain') throw Object.assign(new Error('Erreur du serveur.'), { kind: 'uncertain' });
+  const result = normalizePackResponse(payload(spec));
+  stock = result.packsRemaining;
+  return result;
+}
+
+const cssText = await fetch('../extension/pack-opening.css').then(response => response.text());
+const packSvg = await fetch('../extension/pack-art.svg').then(response => response.text());
+const puzzleSvg = await fetch('../extension/pack-art-puzzle.svg').then(response => response.text());
+let muted = false;
+let packStyle = 'puzzle';
+let antiSpoil = false;
+try { packStyle = localStorage.getItem('packDesign') || 'puzzle'; antiSpoil = localStorage.getItem('packAntiSpoil') === 'true'; } catch {}
+
+function launch() {
+  const image = document.querySelector('#pack img').getBoundingClientRect();
+  openPackExperience({
+    requestOpen, remaining: stock, sourceRect: image, packSvg, puzzleSvg, puzzleBack: new URL('../extension/card-back-puzzle.svg', location.href).href, assetOrigin: ORIGIN, cssText, muted,
+    onMuteChange: value => { muted = value; },
+    packStyle,
+    onPackStyleChange: value => { packStyle = value; try { localStorage.setItem('packDesign', value); } catch {} },
+    antiSpoil,
+    onAntiSpoilChange: value => { antiSpoil = value; try { localStorage.setItem('packAntiSpoil', String(value)); } catch {} },
+    collectionPath: '/lab/collection-mock.html',
+    onClose(outcome, destroy) { destroy(); console.info('Fermé', outcome); if (stock === 0) stock = 7; },
+  });
+}
+
+const grid = document.getElementById('scenarios');
+for (const name of Object.keys(scenarios)) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.textContent = name;
+  button.addEventListener('click', () => { current = name; launch(); });
+  grid.append(button);
+}
+document.getElementById('pack').addEventListener('click', launch);
+window.__lab = { launch, set scenario(name) { current = name; } };
+</script>
+</body>
+</html>
