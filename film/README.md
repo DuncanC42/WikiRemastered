@@ -5,8 +5,8 @@ Un film de 44 secondes (1920 × 1080, 60 i/s, son stéréo), fait entièrement e
 | Temps | Scène | Ce qui se passe |
 | --- | --- | --- |
 | 0:00 | **Ouverture (3D)** | La pièce verte tombe du noir et se pose. Un sol de pièces qui s’emboîtent monte autour d’elle en vague, puis redescend. Le W et le + se posent sur la pièce, les deux mots montent à côté : le logo du menu, sur deux lignes. |
-| 0:06 | **Le paquet (filmé)** | L’ouverture réelle de l’extension (labo, cartes aux vraies images) : un clic sur « Ouvrir le paquet », les ciseaux, la lumière, les cartes. La caméra s’approche sur la découpe et sur la légendaire. « Ouvrir un paquet devient un moment. » |
-| 0:21 | **Design (filmé)** | Trois clics sur « Changer de design » : le paquet fait un tour à chaque fois, du puzzle au vert, au globe, puis au foil sombre. |
+| 0:06 | **Le paquet (filmé)** | L’ouverture réelle de l’extension, avec le paquet globe (le design par défaut), dans le labo, cartes aux vraies images : un clic sur « Ouvrir le paquet », les ciseaux, la lumière, les cartes. La caméra s’approche sur la découpe et sur la légendaire. « Ouvrir un paquet devient un moment. » |
+| 0:21 | **Design (filmé)** | Trois clics sur « Changer de design » : le paquet fait un tour à chaque fois, du globe au puzzle, au vert, puis au foil sombre. |
 | 0:25 | **Collection +** | Les doublons s’empilent sur leur premier exemplaire, avec les vues sur 30 jours et le prix estimé. |
 | 0:29 | **Défausse groupée** | Les cartes que personne ne regarde sont marquées, favoris et échanges restent protégés. Un clic, elles partent. |
 | 0:33 | **Marché +** | Des mots-clés, un plafond par carte et un budget : la session s’active et les cartes qui correspondent reçoivent leur enchère l’une après l’autre, en lot. |

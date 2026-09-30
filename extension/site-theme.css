@@ -576,17 +576,17 @@ html[data-wme-theme='graphite'] [data-wme-reveal-pages] > button[data-wme-page-a
 }
 
 /* Normal pack: the extension's art replaces the rendered image only, in the design picked in the
-   opening (the puzzle pack by default, the green one, the white one, the dark foil one, or the site's own).
+   opening (the globe by default, the puzzle pack, the green one, the dark foil one, or the site's own).
    The native <img>, its src, handlers and reveal animations are untouched. */
 html[data-wme-theme='graphite']:not([data-wme-pack-style='classic']) main button img[alt='Ouvrir un paquet'] {
-  content: url('chrome-extension://__MSG_@@extension_id__/pack-art-puzzle.svg');
+  content: url('chrome-extension://__MSG_@@extension_id__/pack-art-globe.svg');
   filter: drop-shadow(0 18px 22px rgb(0 0 0 / 50%)) !important;
 }
 html[data-wme-theme='graphite'][data-wme-pack-style='green'] main button img[alt='Ouvrir un paquet'] {
   content: url('chrome-extension://__MSG_@@extension_id__/pack-art-green.svg');
 }
-html[data-wme-theme='graphite'][data-wme-pack-style='globe'] main button img[alt='Ouvrir un paquet'] {
-  content: url('chrome-extension://__MSG_@@extension_id__/pack-art-globe.svg');
+html[data-wme-theme='graphite'][data-wme-pack-style='puzzle'] main button img[alt='Ouvrir un paquet'] {
+  content: url('chrome-extension://__MSG_@@extension_id__/pack-art-puzzle.svg');
 }
 html[data-wme-theme='graphite'][data-wme-pack-style='dark'] main button img[alt='Ouvrir un paquet'] {
   content: url('chrome-extension://__MSG_@@extension_id__/pack-art.svg');

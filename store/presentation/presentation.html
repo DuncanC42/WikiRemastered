@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="fr">
+<meta charset="utf-8">
+<title>WikiRemastered · présentation</title>
+<!-- The first image of the Chrome Web Store listing (1280 × 800): the four drawn packs in a fan,
+     the globe in front, a legendary card, the features on either side. Rendered by render.sh. -->
+<style>
+  @font-face { font-family: Rubik; font-weight: 700; src: url(fonts/rubik-latin-700-normal.woff2); }
+  @font-face { font-family: Rubik; font-weight: 900; src: url(fonts/rubik-latin-900-normal.woff2); }
+  @font-face { font-family: Inter; font-weight: 100 900; src: url(fonts/inter-latin-wght-normal.woff2); }
+  @font-face { font-family: Outfit; font-weight: 500; src: url(fonts/outfit-latin-500-normal.woff2); }
+  @font-face { font-family: Outfit; font-weight: 700; src: url(fonts/outfit-latin-700-normal.woff2); }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1280px; height: 800px; overflow: hidden; }
+  body {
+    position: relative;
+    background:
+      radial-gradient(ellipse 46% 52% at 50% 58%, rgb(61 220 151 / .16), transparent 70%),
+      radial-gradient(ellipse 70% 80% at 50% 50%, #1b201e, #101312 60%, #0a0c0b);
+    font-family: Inter, system-ui, sans-serif;
+    color: #f3f6f2;
+  }
+  /* Film grain, over everything. */
+  body::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .09; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .logo { position: absolute; left: 50%; top: 42px; width: 470px; transform: translateX(-50%); filter: drop-shadow(0 10px 18px rgb(0 0 0 / .45)); }
+  .tagline { position: absolute; left: 0; right: 0; top: 104px; text-align: center; font: 500 17px/1 Inter; letter-spacing: .02em; color: #9aa59f; }
+
+  /* The packs, in a fan; the globe in front. */
+  .fan { position: absolute; left: 640px; top: 432px; }
+  .pack { position: absolute; width: 196px; height: 306px; left: -98px; top: -153px; filter: drop-shadow(0 26px 30px rgb(0 0 0 / .55)); }
+  .pack img { width: 100%; height: 100%; display: block; }
+  .pack.puzzle { transform: translate(-150px, 20px) rotate(-15deg); }
+  .pack.green { transform: translate(-62px, -4px) rotate(-6deg); }
+  .pack.dark { transform: translate(166px, 18px) rotate(13deg); }
+  .pack.globe { width: 236px; height: 369px; left: -118px; top: -184px; transform: translate(48px, 0) rotate(4deg); z-index: 3; filter: drop-shadow(0 34px 40px rgb(0 0 0 / .6)); }
+  .shadow { position: absolute; left: -280px; top: 180px; width: 560px; height: 60px; border-radius: 50%; background: radial-gradient(closest-side, rgb(0 0 0 / .55), transparent); }
+
+  /* A card of the game, as the opening draws it. */
+  .card { position: absolute; width: 126px; aspect-ratio: 5 / 7; container-type: inline-size; z-index: 4; transform: translate(146px, 70px) rotate(13deg); filter: drop-shadow(0 18px 24px rgb(0 0 0 / .55)); }
+  .card .face { position: absolute; inset: 0; overflow: hidden; border-radius: 6.4cqw; background: #d4f5e3; }
+  .card .frame { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.8); }
+  .card .art { position: absolute; inset: 0 0 auto; height: 45%; overflow: hidden; }
+  .card .art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .card .chip { position: absolute; left: 4cqw; top: 4cqw; padding: 1.3cqw 3.2cqw; border-radius: 2.4cqw; font: 800 5cqw/1 Outfit; color: #0d1117; background: #ffe144; z-index: 2; }
+  .card .body { position: absolute; inset: 45% 0 0; display: flex; flex-direction: column; padding: 5.5cqw; color: #000; }
+  .card h3 { margin: 0; font: 700 7cqw/1.15 Outfit; }
+  .card p { margin: 1.6cqw 0 0; font: 500 5cqw/1.3 Outfit; color: rgb(23 23 23 / .85); }
+  .card .stats { margin-top: auto; display: flex; justify-content: space-between; padding-top: 2.6cqw; border-top: 1px solid rgb(0 0 0 / .2); font: 700 5.4cqw/1 Outfit; }
+  .card .sheen { position: absolute; inset: 0; background: linear-gradient(110deg, transparent 38%, rgb(255 255 255 / .45) 48%, transparent 58%); mix-blend-mode: overlay; }
+
+  /* The features, on either side. */
+  .features { position: absolute; top: 232px; width: 272px; display: grid; gap: 28px; }
+  .features.left { left: 50px; }
+  .features.right { right: 50px; text-align: right; }
+  .feature b { display: flex; align-items: center; gap: 10px; font: 700 21px/1.15 Rubik; letter-spacing: -.01em; }
+  .features.right .feature b { justify-content: flex-end; }
+  .feature span { display: block; margin-top: 6px; font: 450 14.5px/1.4 Inter; color: #9aa59f; }
+  .dot { width: 11px; height: 11px; border-radius: 50%; flex: none; box-shadow: 0 0 14px currentColor; }
+  .bottom { position: absolute; left: 0; right: 0; bottom: 26px; display: flex; justify-content: center; gap: 10px; font: 600 13px/1 Inter; color: #8a948f; }
+  .bottom span { padding: 8px 12px; border: 1px solid #262b29; border-radius: 999px; background: rgb(24 27 26 / .7); }
+</style>
+<body>
+  <img class="logo" src="../../extension/logo-wikiremastered.svg" alt="WikiRemastered">
+  <div class="tagline">L’extension qui remasterise Wiki Masters</div>
+
+  <div class="features left">
+    <div class="feature"><b><i class="dot" style="background:#3ddc97;color:#3ddc97"></i>Ouverture en 3D</b><span>Découpez le paquet aux ciseaux, la lumière jaillit, les cartes se révèlent une à une.</span></div>
+    <div class="feature"><b><i class="dot" style="background:#ffc53a;color:#ffc53a"></i>Cinq designs de paquet</b><span>Globe, puzzle, vert, foil sombre ou visuel d’origine, chacun avec ses dos de cartes.</span></div>
+    <div class="feature"><b><i class="dot" style="background:#ff8cc6;color:#ff8cc6"></i>Anti-spoil</b><span>Rien ne trahit la rareté avant le retournement.</span></div>
+  </div>
+  <div class="features right">
+    <div class="feature"><b>Collection +<i class="dot" style="background:#6fa8ff;color:#6fa8ff"></i></b><span>Doublons empilés, vues sur 30 jours et prix estimés sous chaque carte.</span></div>
+    <div class="feature"><b>Défausse groupée<i class="dot" style="background:#ff5a4c;color:#ff5a4c"></i></b><span>Les cartes inutiles en un clic, favoris et échanges toujours protégés.</span></div>
+    <div class="feature"><b>Marché +<i class="dot" style="background:#3ddc97;color:#3ddc97"></i></b><span>Enchères en lot par mots-clés, dans le plafond et le budget que vous fixez.</span></div>
+  </div>
+
+  <div class="fan">
+    <div class="shadow"></div>
+    <div class="pack dark"><img src="../images/designs/pack-dark.png" alt=""></div>
+    <div class="pack puzzle"><img src="../images/designs/pack-puzzle.png" alt=""></div>
+    <div class="pack green"><img src="../images/designs/pack-green.png" alt=""></div>
+    <div class="pack globe"><img src="../images/designs/pack-globe.png" alt=""></div>
+    <div class="card"><div class="face">
+      <img class="frame" src="https://www.wiki-masters.com/legendaire.png" alt="">
+      <div class="art"><img src="https://www.wiki-masters.com/cards/grande-muraille.jpg" alt=""></div>
+      <span class="chip">L</span>
+      <div class="body"><h3>Grande Muraille</h3><p>fortifications de la frontière nord de la Chine</p><div class="stats"><span>⚔ 8 970</span><span>🛡 6 120</span></div></div>
+      <div class="sheen"></div>
+    </div></div>
+  </div>
+
+  <div class="bottom"><span>Thème graphite pour tout le site</span><span>Tout reste dans votre navigateur</span><span>Open source</span></div>
+</body>
+</html>

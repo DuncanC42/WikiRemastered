@@ -23,7 +23,7 @@
 <main>
   <h1>Labo d’ouverture</h1>
   <p>Réponses simulées au format réel de <code>/api/packs/open</code>. Aucun paquet n’est consommé.</p>
-  <button id="pack" type="button" aria-label="Ouvrir un paquet simulé"><img alt="" src="../extension/pack-art-puzzle.svg"></button>
+  <button id="pack" type="button" aria-label="Ouvrir un paquet simulé"><img alt="" src="../extension/pack-art-globe.svg"></button>
   <div class="grid" id="scenarios"></div>
 </main>
 <script type="module">
@@ -114,9 +114,9 @@ const puzzleSvg = await fetch('../extension/pack-art-puzzle.svg').then(response 
 const greenSvg = await fetch('../extension/pack-art-green.svg').then(response => response.text());
 const globeSvg = await fetch('../extension/pack-art-globe.svg').then(response => response.text());
 let muted = false;
-let packStyle = 'puzzle';
+let packStyle = 'globe';
 let antiSpoil = false;
-try { packStyle = localStorage.getItem('packDesign') || 'puzzle'; antiSpoil = localStorage.getItem('packAntiSpoil') === 'true'; } catch {}
+try { packStyle = localStorage.getItem('packDesign') || 'globe'; antiSpoil = localStorage.getItem('packAntiSpoil') === 'true'; } catch {}
 
 function launch() {
   const image = document.querySelector('#pack img').getBoundingClientRect();

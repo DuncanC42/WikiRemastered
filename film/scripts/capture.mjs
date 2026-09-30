@@ -1,14 +1,17 @@
 /* Films the extension's real pack opening from the lab (lab/pack-opening.html), frame by frame,
  * for the film: node scripts/capture.mjs <take> [frames]
- *   pack    the puzzle pack: cut, light, cards out, five reveals (legendary last), the summary
- *   design  the design switch: three clicks, the pack turns from the puzzle to the green, the
- *           globe and the dark foil
+ *   pack    the globe pack (the default): cut, light, cards out, five reveals (legendary last), the summary
+ *   design  the design switch: three clicks, the pack turns from the globe to the puzzle, the
+ *           green and the dark foil
  *   green   the green pack: waiting, cut, its cards out, the first reveals (a check of the design)
  *   globe   the same, on the white pack
  * Frames land in public/capture/<take>/f00000.jpg (1920 × 1080). The page runs on virtual time
  * (scripts/virtual-time.js), moved by exactly 1/60 s per frame, so the capture is smooth however
  * slow the screenshots are. Clicks are real (trusted) input events, as a player's would be.
  * Needs Google Chrome and a network connection (the lab's cards show the site's pictures).
+ * Debugging aids: CHROME_FLAGS adds flags to Chrome ("--disable-gpu --disable-gpu-compositing"
+ * reproduces a browser without hardware acceleration); INJECT_CSS and INJECT_JS run in the
+ * opening's shadow root at frame 5.
  */
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:http';
@@ -45,7 +48,7 @@ const origin = `http://127.0.0.1:${server.address().port}`;
 const port = 9800 + Math.floor(Math.random() * 150);
 const chrome = spawn(CHROME, [
   '--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${mkdtempSync(join(tmpdir(), 'wr-capture-'))}`,
-  `--window-size=${VIEW.width},${VIEW.height}`, '--hide-scrollbars', `--force-device-scale-factor=${VIEW.scale}`, '--mute-audio', 'about:blank',
+  `--window-size=${VIEW.width},${VIEW.height}`, '--hide-scrollbars', `--force-device-scale-factor=${VIEW.scale}`, '--mute-audio', ...(process.env.CHROME_FLAGS ? process.env.CHROME_FLAGS.split(' ') : []), 'about:blank',
 ], { stdio: 'ignore' });
 let page;
 for (let attempt = 0; attempt < 60 && !page; attempt += 1) {
@@ -111,7 +114,7 @@ const mark = (name, frame) => { if (marks[name] === undefined) marks[name] = fra
 const scripts = {
   globe: (...args) => scripts.green(...args), // Same take, on the white pack.
   async pack(frame, s) {
-    if (frame === 0) await evaluate(`window.launch('puzzle'), true`);
+    if (frame === 0) await evaluate(`window.launch('globe'), true`);
     if (!s) return;
     if (s.phase === 'ready') mark('ready', frame);
     // A slow drift of the pointer, so the pack leans to it as it would under a hand.
@@ -152,11 +155,11 @@ const scripts = {
     if (marks.clicked && frame >= marks.clicked + 90) return 'done';
   },
   async design(frame, s) {
-    if (frame === 0) await evaluate(`window.launch('puzzle'), true`);
+    if (frame === 0) await evaluate(`window.launch('globe'), true`);
     if (!s) return;
     if (s.phase === 'ready') mark('ready', frame);
     if (s.phase === 'ready') await move([720 + Math.sin(frame / 50) * 170, 390 + Math.cos(frame / 70) * 70]);
-    // Three clicks, a beat and a half apart: puzzle, green, globe, dark.
+    // Three clicks, a beat and a half apart: globe, puzzle, green, dark.
     if (at('ready') !== undefined && [40, 130, 220].includes(frame - at('ready'))) {
       const button = await evaluate(inOpening(`const b = [...shadow.querySelectorAll('.hud button')].find(b => /design/i.test(b.textContent) && !b.hidden); if (!b) return null; const r = b.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2];`));
       if (button) { marks.designButton = button; (marks.designClicks ||= []).push(frame); await click(button); }
@@ -170,6 +173,9 @@ let frame = 0;
 let lastPhase = null;
 for (; frame < Number(limit); frame += 1) {
   const s = await state();
+  // A debugging aid: extra CSS in the opening's shadow root (INJECT_CSS).
+  if (process.env.INJECT_CSS && frame === 5) await evaluate(inOpening(`const style = document.createElement('style'); style.textContent = ${JSON.stringify(process.env.INJECT_CSS)}; shadow.append(style); return true;`));
+  if (process.env.INJECT_JS && frame === 5) await evaluate(inOpening(process.env.INJECT_JS));
   // Every change of phase, for the soundtrack's cues.
   if (s && s.phase !== lastPhase) { (marks.phases ||= []).push([frame, s.phase]); lastPhase = s.phase; }
   if ((await scripts[take](frame, s)) === 'done') break;

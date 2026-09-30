@@ -685,15 +685,40 @@ function buildPackVolume(body) {
   body.append(base);
 }
 
+/* Without hardware acceleration, Chrome composites the page in software, and there it drops the
+   planes of a 3D scene that are cut by a clip-path: whole bands of the pack's face vanish, and the
+   dark back shows through. Such a browser has no WebGL, or a software one: then the pack is drawn
+   flat (its face one image, turned in 3D as a whole), without its back and walls. */
+let softwareCompositing;
+function isSoftwareCompositing() {
+  if (softwareCompositing !== undefined) return softwareCompositing;
+  try {
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    if (!gl) softwareCompositing = true;
+    else {
+      const info = gl.getExtension('WEBGL_debug_renderer_info');
+      const renderer = String(gl.getParameter(info ? info.UNMASKED_RENDERER_WEBGL : gl.RENDERER));
+      gl.getExtension('WEBGL_lose_context')?.loseContext();
+      softwareCompositing = /swiftshader|llvmpipe|softpipe|software|basic render/i.test(renderer);
+    }
+  } catch { softwareCompositing = true; }
+  return softwareCompositing;
+}
+
 /* ─── Experience ──────────────────────────────────────────────────────────── */
 
 export function openPackExperience({
   requestOpen, remaining = null, capacity = 10, sourceRect = null, packSrc, packSvg, puzzleSvg, puzzleBack, greenSvg, greenBack, globeSvg, globeBack,
   assetOrigin = location.origin, cssText = '', muted = false, onMuteChange, onClose,
-  packStyle = 'puzzle', onPackStyleChange, speed: initialSpeed = 1, onSpeedChange,
+  packStyle = 'globe', onPackStyleChange, speed: initialSpeed = 1, onSpeedChange,
   antiSpoil: initialAntiSpoil = false, onAntiSpoilChange, collectionPath = '/collection',
+  flat = isSoftwareCompositing(),
 } = {}) {
-  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // The opening is the same whatever the system's "reduce motion" setting (on Windows, turning
+  // animation effects off sets it): nothing of it is cut or shortened. Speed stays the player's
+  // own choice (×1, ×2, ×3).
+  const reduced = false;
   const scale = reduced ? .35 : 1;
   const host = h('div');
   host.dataset.wme = 'pack-opening';
@@ -706,6 +731,7 @@ export function openPackExperience({
   dialog.tabIndex = -1;
   dialog.setAttribute('aria-label', 'Ouverture du paquet');
   const root = h('div', 'root');
+  if (flat) root.dataset.flat = '';
   root.dataset.phase = 'summon';
 
   const backdrop = h('div', 'backdrop');
@@ -912,15 +938,14 @@ export function openPackExperience({
   dialog.append(root);
   shadow.append(style, dialog);
 
-  // Five designs, in the order the button goes through them: the colourful puzzle pack (the
-  // default), the green one, the white one (the world as a puzzle), the dark foil one and the
-  // site's own. Those drawn by the extension get
+  // Five designs, in the order the button goes through them: the white one, the world as a puzzle
+  // (the default), the colourful puzzle pack, the green one, the dark foil one and the site's own. Those drawn by the extension get
   // their own dog-eared corner each time. The foil is masked by the art, so it stays hidden until the image
   // is decoded: otherwise the foil and the glow briefly draw a plain rectangle.
   const LOOKS = [
+    { name: 'globe', svg: globeSvg, label: 'paquet globe' },
     { name: 'puzzle', svg: puzzleSvg, label: 'paquet puzzle' },
     { name: 'green', svg: greenSvg, label: 'paquet vert' },
-    { name: 'globe', svg: globeSvg, label: 'paquet globe' },
     { name: 'dark', svg: packSvg, label: 'paquet sombre' },
     { name: 'classic', label: 'paquet d’origine' },
   ].filter(look => look.name === 'classic' || look.svg);
@@ -2846,7 +2871,8 @@ export function installPackOpening({ cssUrl, packUrl, puzzleUrl, puzzleBackUrl, 
   function onPulls() { return location.pathname.replace(/\/$/, '') === '/pulls'; }
 
   // The design is kept as `packDesign`: the older `packStyle` (dark or classic) is left behind,
-  // so that everyone starts on the puzzle pack, the new default, once.
+  // so that everyone once started on the drawn packs; the default is now the globe (players who
+  // picked a design keep it).
   async function preferences() {
     try { return await chrome.storage.local.get(['packFxMuted', 'packDesign', 'packFxSpeed', 'packAntiSpoil']); } catch { return {}; }
   }
@@ -2854,8 +2880,8 @@ export function installPackOpening({ cssUrl, packUrl, puzzleUrl, puzzleBackUrl, 
     if (extensionAlive()) chrome.storage.local.set(values).catch(() => {});
   }
   // The native Paquets page shows the same pack design as the experience (see site-theme.css).
-  const DESIGNS = ['puzzle', 'green', 'globe', 'dark', 'classic'];
-  const designOf = value => (DESIGNS.includes(value) ? value : 'puzzle');
+  const DESIGNS = ['globe', 'puzzle', 'green', 'dark', 'classic'];
+  const designOf = value => (DESIGNS.includes(value) ? value : 'globe');
   function applyStyle(value) {
     document.documentElement.setAttribute('data-wme-pack-style', designOf(value));
   }

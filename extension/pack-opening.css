@@ -289,6 +289,10 @@ dialog::backdrop { background: transparent; }
   transform: translateZ(calc(var(--z) * var(--wme-inflate, 1))) rotateX(calc(var(--a) * var(--wme-inflate, 1)));
 }
 .pack-base { clip-path: inset(91.75% 0 0 0); }
+/* Without hardware acceleration (see isSoftwareCompositing): the pack drawn flat, its face one
+   image turned in 3D as a whole; no back, no walls (a software compositor draws them over it). */
+.root[data-flat] .pack-body, .root[data-flat] .pack-face { transform-style: flat; }
+.root[data-flat] .pack-face[data-side="back"], .root[data-flat] .pack-wall { display: none; }
 /* Back of the pack: plain dark foil, cut to the same silhouette. */
 .pack-face[data-side="back"] .band {
   background:
@@ -1269,16 +1273,6 @@ button {
   .tray { left: auto; right: max(16px, env(safe-area-inset-right)); bottom: auto; top: 50%; transform: translateY(-50%); flex-direction: column; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .pack-float, .ground, .loading { animation: none !important; }
-  .pack-sweep { display: none !important; }
-  .pack-guide::after { animation: none !important; width: 0; }
-  .guide-scissors, .scissors-body { animation: none !important; }
-  .guide-scissors { left: 16%; }
-  .guide-scissors .half, .snip-spark { animation: none !important; }
-  .snip-spark { opacity: 0; }
-  .card.pass .sheen { animation: none !important; }
-  .shake-1, .shake-2, .shake-3 { animation: none; }
 }
 
 .root[data-tearing] .design-switch { opacity: 0; pointer-events: none; }
@@ -1321,8 +1315,6 @@ button {
 .favorite-notice { position: absolute; z-index: 50; left: 50%; bottom: 80px; transform: translateX(-50%); width: max-content; max-width: calc(100% - 32px); margin: 0; padding: 10px 14px; border-radius: 8px; background: #232327; color: #f5f5f7; font-size: 13px; }
 @media (hover: hover) { .card-favorite:hover { background-color: rgb(52 52 58 / 82%); color: #f5f5f7; } .card-favorite[aria-pressed='true']:hover { background-color: rgb(28 44 66 / 88%); } }
 @media (pointer: coarse) { .card-favorite { width: 36px; height: 36px; } .card-favorite svg { width: 18px; height: 18px; } .front:has(.card-favorite) > .shiny-chip { top: calc(3.4cqw + 42px); } }
-@media (prefers-reduced-motion: no-preference) {
-  .card-favorite { transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease; }
-  .card-favorite[aria-busy='true']::after { animation: favorite-loading 800ms linear infinite; }
-  @keyframes favorite-loading { to { transform: rotate(360deg); } }
-}
+.card-favorite { transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease; }
+.card-favorite[aria-busy='true']::after { animation: favorite-loading 800ms linear infinite; }
+@keyframes favorite-loading { to { transform: rotate(360deg); } }

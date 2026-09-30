@@ -95,8 +95,8 @@ async function open(design, scenario) {
   await sleep(1400);
 }
 
-// 1. The puzzle pack, ready to be cut.
-await open('puzzle', 'Légendaire');
+// 1. The globe pack (the default), ready to be cut.
+await open('globe', 'Légendaire');
 await shot('screenshot-1-paquet.png');
 // 2. The opening: the pieces fly out with their ribbons.
 const button = await centerOf('.pack-open-button');

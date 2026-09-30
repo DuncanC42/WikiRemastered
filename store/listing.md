@@ -7,7 +7,7 @@ Tout ce qu’il faut pour remplir la fiche dans le [tableau de bord développeur
 Dans le [tableau de bord développeur](https://chrome.google.com/webstore/devconsole), sur la fiche de WikiRemastered :
 
 1. **Paquet** › **Importer un nouveau paquet** : `dist/WikiRemastered-1.33.0-chrome-web-store.zip` (produit par `python3 scripts/package.py`). La version doit être plus élevée que le dernier envoi : 1.33.0 convient, qu’un envoi 1.32.0 ait eu lieu ou non.
-2. **Fiche Play Store** : remplacer la description par celle ci-dessous (le résumé vient du manifeste). Remplacer les captures 7 et 8 et la grande vignette (le bouton et la mention AFK ont disparu).
+2. **Fiche Play Store** : remplacer la description par celle ci-dessous (le résumé vient du manifeste). Remplacer les captures par celles listées plus bas, l’image de présentation en premier, et la grande vignette (le bouton et la mention AFK ont disparu).
 3. **Confidentialité** : remplacer la justification de `alarms` et de `storage` par celles ci-dessous. Laisser « Code distant : Non ».
 4. Vérifier que la page des règles de confidentialité est à jour en ligne (elle suit `store/privacy.md` une fois poussé sur GitHub).
 5. **Envoyer pour examen**.
@@ -15,7 +15,8 @@ Dans le [tableau de bord développeur](https://chrome.google.com/webstore/devcon
 Ce qui a changé depuis la version examinée, si l’on veut le préciser :
 
 - Les ouvertures AFK (ouverture automatique d’un paquet à 10/10) sont **supprimées** : plus aucun paquet n’est ouvert sans un clic de l’utilisateur. Une mise à jour efface leur alarme et leurs données locales.
-- Deux nouveaux designs de paquet (vert, globe) et leurs dos de cartes.
+- Deux nouveaux designs de paquet (vert, globe) et leurs dos de cartes ; le globe devient le design par défaut.
+- L’ouverture fonctionne aussi sans accélération matérielle (le paquet y est dessiné à plat).
 - Anti-spoil garde l’ordre des cartes (la meilleure à la fin) et ne cache que les couleurs avant le retournement.
 
 ## À téléverser
@@ -26,10 +27,10 @@ Ce qui a changé depuis la version examinée, si l’on veut le préciser :
 | Icône de la boutique (128 × 128) | `store/images/icon-128.png` |
 | Petite vignette promotionnelle (440 × 280, obligatoire) | `store/images/promo-small-440x280.png` |
 | Grande vignette (1400 × 560, facultative) | `store/images/promo-marquee-1400x560.png` |
-| Captures d’écran (1280 × 800, 5 au plus) | Dans cet ordre : `store/images/screenshot-1-paquet.png`, `screenshot-2-ouverture.png`, `screenshot-5-fiche.png`, `screenshot-7-marche.png`, `screenshot-8-collection.png`. En réserve : `-3-revelation`, `-4-recapitulatif`, `-6-paquet-sombre`. |
+| Captures d’écran (1280 × 800, 5 au plus) | Dans cet ordre : `store/images/screenshot-0-presentation.png` (l’image de présentation : les paquets et les fonctionnalités), `screenshot-2-ouverture.png`, `screenshot-5-fiche.png`, `screenshot-7-marche.png`, `screenshot-8-collection.png`. En réserve : `-1-paquet`, `-3-revelation`, `-4-recapitulatif`, `-6-paquet-sombre`. |
 | Visuels des designs (facultatif, pour une page ou un post) | `store/images/designs/` : faces des paquets et dos des cartes, en PNG transparent. |
 
-Les images se refont avec `node scripts/brand.mjs`, `sh scripts/brand-png.sh` et `node scripts/store-shots.mjs` (captures 1 à 6, prises dans le labo avec des paquets simulés). Les captures 7 et 8 (Marché + et Collection +) viennent du vrai site, ramenées à 1280 × 800.
+Les images se refont avec `node scripts/brand.mjs`, `sh scripts/brand-png.sh`, `node scripts/store-shots.mjs` (captures 1 à 6, prises dans le labo avec des paquets simulés) et `sh store/presentation/render.sh` (l’image de présentation). Les captures 7 et 8 (Marché + et Collection +) viennent du vrai site, ramenées à 1280 × 800.
 
 ## Fiche
 
@@ -46,7 +47,7 @@ Thème graphite, ouvertures de paquets en 3D, collection enrichie, défausse et 
 
 > WikiRemastered donne une nouvelle peau et de nouveaux outils à Wiki Masters, le jeu de cartes Wikipédia (wiki-masters.com).
 >
-> Ouvrir un paquet devient un moment : le paquet arrive en 3D, se découpe d’un geste avec une petite paire de ciseaux, laisse filer une lumière et des pièces de puzzle aux couleurs des cartes qu’il contient, puis les cartes sortent et se révèlent une à une, la meilleure en dernier, avec sa mise en scène. Cinq designs de paquet au choix (puzzle illustré, vert, globe, foil sombre ou visuel d’origine), chacun avec son dos de cartes, un mode Anti-spoil qui ne trahit rien avant le retournement, et une fiche pour chaque carte, sans quitter l’ouverture.
+> Ouvrir un paquet devient un moment : le paquet arrive en 3D, se découpe d’un geste avec une petite paire de ciseaux, laisse filer une lumière et des pièces de puzzle aux couleurs des cartes qu’il contient, puis les cartes sortent et se révèlent une à une, la meilleure en dernier, avec sa mise en scène. Cinq designs de paquet au choix (globe, puzzle illustré, vert, foil sombre ou visuel d’origine), chacun avec son dos de cartes, un mode Anti-spoil qui ne trahit rien avant le retournement, et une fiche pour chaque carte, sans quitter l’ouverture.
 >
 > Et aussi :
 > • un thème graphite soigné pour tout le site ;
