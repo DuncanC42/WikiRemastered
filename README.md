@@ -2,6 +2,11 @@
 
 ![WikiRemastered](store/images/screenshot-0-presentation.png)
 
+> **Portage Firefox non officiel** de [WikiRemastered](https://github.com/Lypningeuh/WikiRemastered) par Lypningeuh.
+> Ce fork n'ajoute que la compatibilité Firefox. Pour tout bug qui n'est pas propre à Firefox, ouvre une issue sur le dépôt original.
+>
+> Construire : `python3 scripts/package-firefox.py`, puis charger `dist/WikiRemastered-firefox/manifest.json` dans `about:debugging`.
+
 Une extension de navigateur non officielle pour [Wiki Masters](https://www.wiki-masters.com), le jeu de cartes Wikipédia : un thème graphite pour tout le site, des ouvertures de paquets en 3D et des outils pour la collection et le marché. Réalisée par un joueur, elle n’est ni éditée ni approuvée par Wiki Masters.
 
 ## Ce qu’elle fait

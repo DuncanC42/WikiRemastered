@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "extension"
 DIST = ROOT / "dist"
 NAME = "WikiRemastered-firefox"
-GECKO_ID = "wikiremastered@lypningeuh"
+GECKO_ID = "wikiremastered-firefox@duncanc42"
 MIN_FIREFOX = "140.0"
 
 
