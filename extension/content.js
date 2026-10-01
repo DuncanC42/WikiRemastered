@@ -3,7 +3,7 @@ import { createToolbar, createCardExtras } from './ui.js';
 import { createPriceLoader } from './prices.js';
 import { planDiscardBatches, parseDiscardBatchResult } from './discard.js';
 import { normalizeBlockedWords, createBlockedWordMatcher } from './protection.js';
-import { getNetworkPause } from './network.js';
+import { getNetworkPause, requestLock } from './network.js';
 import { RARITIES } from './pack-cards.js';
 import { extensionAlive, onInvalidated } from './runtime.js';
 
@@ -717,7 +717,7 @@ function createSession() {
     let operationError = null;
     try {
       // One mutation queue per origin, including other collection tabs.
-      await navigator.locks.request('wme:discard', { ifAvailable: true }, async (lock) => {
+      await requestLock('wme:discard', { ifAvailable: true }, async (lock) => {
         if (!lock) throw new Error('Une défausse est déjà en cours dans un autre onglet.');
         if (!singleId) {
           await preferenceWrites;

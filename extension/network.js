@@ -125,6 +125,21 @@ function wait(ms, signal) {
   });
 }
 
+/** navigator.locks.request() that also works from a Firefox content script. There, the lock
+ * manager belongs to the page and reading `then` on the extension's promise is a "Permission
+ * denied": the held phase is handed over as a promise of the page's own, and the callback runs
+ * entirely on the extension's side (its results and errors never cross over). Chrome: unchanged. */
+export function requestLock(name, options, callback) {
+  const page = typeof window === 'object' ? window.wrappedJSObject : undefined;
+  if (typeof exportFunction !== 'function' || !page?.Promise) return navigator.locks.request(name, options, callback);
+  return new Promise((resolve, reject) => {
+    const held = lock => new page.Promise(exportFunction(release => {
+      Promise.resolve().then(() => callback(lock)).then(resolve, reject).finally(() => release());
+    }, page));
+    navigator.locks.request(name, options, exportFunction(held, page)).catch(reject);
+  });
+}
+
 /** One origin-wide request at a time, including its body. Waiting for a free
  * slot may repeat; no HTTP request, especially no mutation, is ever replayed.
  * beforeSend is the caller's final authorization after any queueing delay. */
@@ -140,7 +155,7 @@ export async function networkFetch(path, options = {}, { beforeSend } = {}) {
     if (signal?.aborted) throw cancelled();
     let result;
     try {
-      result = await navigator.locks.request(lockName, { mode: 'exclusive', ...(signal ? { signal } : {}) }, async () => {
+      result = await requestLock(lockName, { mode: 'exclusive', ...(signal ? { signal } : {}) }, async () => {
         let state;
         try { state = await readState(); }
         catch { throw paused({ until: Date.now() + 30_000 }); }

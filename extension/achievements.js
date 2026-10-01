@@ -140,7 +140,7 @@
       if (immediate || Date.now() >= readSchedule().next) {
         running = true;
         try {
-          await navigator.locks.request('wme:achievement-claims', { ifAvailable: true }, async lock => {
+          await network.requestLock('wme:achievement-claims', { ifAvailable: true }, async lock => {
             if (!lock || (!immediate && Date.now() < readSchedule().next)) return;
             const previous = readSchedule();
             saveSchedule({ ...previous, next: Date.now() + INTERVAL });

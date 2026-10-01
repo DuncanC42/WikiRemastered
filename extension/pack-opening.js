@@ -150,6 +150,19 @@ const SCISSORS_CURSORS = Object.fromEntries(Object.entries(SCISSORS_INK).map(([n
    twenty-five layers, each card one more), filters and all, and the dark pack's animated sweep
    made that happen at every frame. As a bitmap, they cost one drawing, done ahead of time. */
 let artStamp = 0;
+// Firefox will not let elements the extension creates load a blob: URL minted with the page's
+// origin ("may not load data from blob:"), and retries it at every repaint; a data: URL loads
+// everywhere. Chrome keeps the lighter blob: URLs. Revoking a data: URL is a harmless no-op.
+const blobUrls = typeof exportFunction !== 'function';
+function artUrl(blob) {
+  if (blobUrls) return Promise.resolve(URL.createObjectURL(blob));
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
+}
 async function rasterArt(url, width, height) {
   const image = new Image();
   image.src = url;
@@ -161,7 +174,7 @@ async function rasterArt(url, width, height) {
   canvas.stamp = ++artStamp; // Tells one drawing from the next (the ribbon is cut from it).
   const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
   if (!blob) throw new Error('art');
-  return { canvas, url: URL.createObjectURL(blob) };
+  return { canvas, url: await artUrl(blob) };
 }
 // Pixels for a CSS size: device pixels, with room for the pack coming a little nearer, capped.
 const artPixels = css => Math.round(css * Math.min(3, Math.max(1.5, (devicePixelRatio || 1) * 1.2)));
@@ -967,7 +980,7 @@ export function openPackExperience({
       // The still art (without the sweep, which is drawn over it, see .pack-sweep), with a new
       // dog-eared corner, drawn once as a bitmap at the size the pack is shown.
       const svg = withFold(art, randomFold()).replace(/<!--sweep-->[\s\S]*?<!--\/sweep-->/, '');
-      const source = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+      const source = await artUrl(new Blob([svg], { type: 'image/svg+xml' }));
       const width = pack.offsetWidth || 290;
       try {
         ({ canvas, url } = await rasterArt(source, artPixels(width), artPixels(width * 1000 / 640)));
@@ -1043,7 +1056,7 @@ export function openPackExperience({
     if (!source) continue;
     fetch(source).then(response => (response.ok ? response.text() : Promise.reject(new Error('back'))))
       .then(async svg => {
-        const blob = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+        const blob = await artUrl(new Blob([svg], { type: 'image/svg+xml' }));
         try { return await rasterArt(blob, artPixels(280), artPixels(392)); } finally { URL.revokeObjectURL(blob); }
       })
       .then(({ url }) => {

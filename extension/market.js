@@ -4,6 +4,7 @@ import { MARKET_DEFAULTS, marketKey, isAccount, eligibleBid, withinBidWindow } f
 import { loadMarketPage, loadAuction, normalizeAuction, placeBid, loadMarketBalance } from './market-api.js';
 import { lateBidKey, LATE_BID_WINDOW_MS } from './late-bid-policy.js';
 import { extensionAlive, onInvalidated } from './runtime.js';
+import { requestLock } from './network.js';
 
 const onMarket = () => location.pathname.replace(/\/$/, '') === '/marketplace';
 const marketDetailId = () => {
@@ -63,7 +64,7 @@ async function executeBid(message, account) {
   }
   // Both bidding modes share this lock across tabs. Re-check under it, so a
   // queued keyword bid cannot compete with a newly scheduled last-minute bid.
-  return navigator.locks.request(`wme:auction-bid:${account}:${message.id}`, async () => {
+  return requestLock(`wme:auction-bid:${account}:${message.id}`, async () => {
     checkAccount(account);
     const values = await chrome.storage.local.get([marketKey(account), lateBidKey(account)]);
     const plan = values[lateBidKey(account)]?.plans?.[message.id];

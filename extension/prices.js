@@ -1,5 +1,5 @@
 import { getMarketSummary, getSuggestedPriceFromSummary } from './api.js';
-import { getNetworkPause } from './network.js';
+import { getNetworkPause, requestLock } from './network.js';
 
 const FRESH_MS = 30 * 60_000;
 const RETAIN_MS = 24 * 60 * 60_000;
@@ -194,7 +194,7 @@ export function createPriceLoader({ accountKey, onChange, signal } = {}) {
   }
 
   async function run(job) {
-    await navigator.locks.request(lockName, { signal: controller.signal }, async () => {
+    await requestLock(lockName, { signal: controller.signal }, async () => {
       if (!available() || !wanted.has(job.id)) return;
       await reload();
       if (storageFailure) {
